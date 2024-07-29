@@ -12,24 +12,24 @@ import { UserLoginComponent } from './user-login/user-login.component';
 import { UserLogoutComponent } from './user-logout/user-logout.component';
 
 const routes: Routes = [
-  { path: '', component: AppComponent },
+	{ path: '', component: AppComponent },
 ];
 
 @NgModule({
-  declarations: [
-    AppComponent,
-    ChatComponent,
-    UserListComponent,
-    UserLoginComponent,
-    UserLogoutComponent
-  ],
-  imports: [
-    BrowserModule,
-    FormsModule,
-    ReactiveFormsModule,
-    RouterModule.forRoot(routes) 
-  ],
-  providers: [WebsocketService],
-  bootstrap: [AppComponent]
+	declarations: [
+		AppComponent,
+		ChatComponent,
+		UserListComponent,
+		UserLoginComponent,
+		UserLogoutComponent
+	],
+	imports: [
+		BrowserModule,
+		FormsModule,
+		ReactiveFormsModule,
+		RouterModule.forRoot(routes) 
+	],
+	providers: [WebsocketService],
+	bootstrap: [AppComponent]
 })
 export class AppModule { }

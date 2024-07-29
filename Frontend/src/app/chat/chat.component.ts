@@ -6,9 +6,9 @@ import { User } from '../../types/user';
 import { Subscription } from 'rxjs';
 
 @Component({
-  selector: 'app-chat',
-  templateUrl: './chat.component.html',
-  styleUrls: ['./chat.component.css'],
+	selector: 'app-chat',
+	templateUrl: './chat.component.html',
+	styleUrls: ['./chat.component.css'],
 })
 export class ChatComponent implements OnInit, OnDestroy {
   @Input() channel!: Channel;
@@ -24,37 +24,37 @@ export class ChatComponent implements OnInit, OnDestroy {
   ) {}
 
   ngOnInit(): void {
-    this.messages = []; 
+  	this.messages = []; 
 
-    // Subscribe to WebSocket messages
-    this.messagesSubscription = this.websocketService.messages$.subscribe((message) => {
-      if (message.channel?.id === this.channel.id) {
-        this.messages.push(message);
-        this.cd.detectChanges(); 
-      }
-    });
+  	// Subscribe to WebSocket messages
+  	this.messagesSubscription = this.websocketService.messages$.subscribe((message) => {
+  		if (message.channel?.id === this.channel.id) {
+  			this.messages.push(message);
+  			this.cd.detectChanges(); 
+  		}
+  	});
   }
 
   ngOnDestroy(): void {
-    if (this.messagesSubscription) {
-      this.messagesSubscription.unsubscribe();
-    }
+  	if (this.messagesSubscription) {
+  		this.messagesSubscription.unsubscribe();
+  	}
   }
 
   ngOnChanges(): void {
-    if (this.channel) {
-      this.messages = [];
-      this.cd.detectChanges(); 
-    }
+  	if (this.channel) {
+  		this.messages = [];
+  		this.cd.detectChanges(); 
+  	}
   }
 
   sendMessage(): void {
-    if (this.newMessage.trim()) {
-      let message = new Message(this.user, this.newMessage, Date.now(), this.channel);
+  	if (this.newMessage.trim()) {
+  		const message = new Message(this.user, this.newMessage, Date.now(), this.channel);
 
-      this.websocketService.sendMessage(message);
-      this.newMessage = '';
-      this.cd.detectChanges(); 
-    }
+  		this.websocketService.sendMessage(message);
+  		this.newMessage = '';
+  		this.cd.detectChanges(); 
+  	}
   }
 }
