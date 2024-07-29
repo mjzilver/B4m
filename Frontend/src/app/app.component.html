@@ -1,0 +1,26 @@
+<div *ngIf="!loggedIn" class="auth-container">
+  <button class="button button-login" (click)="login()">Login</button>
+</div>
+
+<div *ngIf="loggedIn" class="app-container">
+  <button class="button button-logout" (click)="logout()">Logout</button>
+  <div class="channels-card">
+    <h2 class="channels-card-title">Channels</h2>
+    <ul class="channels-card-list">
+      <li *ngFor="let channel of channels" class="channels-card-item">
+        <button 
+          class="button button-channel" 
+          (click)="selectChannel(channel)"
+          [ngClass]="{'selected-channel': channel.id === selectedChannel?.id}"
+        >
+          <span class="channels-card-name">{{ channel.name }}</span>
+          <span class="channels-card-users">({{ channel.users.length }} users)</span>
+        </button>
+      </li>
+    </ul>
+  </div>
+  <div class="user-chat-container">
+    <app-user-list [users]="users"></app-user-list>
+    <app-chat *ngIf="selectedChannel" [channel]="selectedChannel" [user]="currentUser"></app-chat>
+  </div>
+</div>

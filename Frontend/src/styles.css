@@ -1,0 +1,87 @@
+body {
+    background-color: #2e2e2e;
+    color: #ffffff;
+    font-family: monospace;
+    margin: 0;
+    padding: 0;
+}
+
+.app-container {
+    display: flex;
+    height: 100vh;
+}
+
+.button {
+    background-color: #555555;
+    border: none;
+    color: #ffffff;
+    padding: 10px 20px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 14px;
+    margin: 4px 2px;
+    cursor: pointer;
+    border-radius: 4px;
+    transition: background-color 0.3s ease;
+}
+
+.button:hover {
+    background-color: #777777;
+}
+
+.button-logout {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+}
+
+.channels-card {
+    background-color: #3b3b3b;
+    width: 20%;
+    padding: 20px;
+    box-shadow: 2px 0 5px rgba(0,0,0,0.5);
+}
+
+.channels-card-title {
+    font-size: 24px;
+    margin-bottom: 20px;
+}
+
+.channels-card-list {
+    list-style-type: none;
+    padding: 0;
+}
+
+.channels-card-item {
+    margin-bottom: 10px;
+}
+
+.channels-card-item .button-channel {
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+}
+
+.user-chat-container {
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+}
+
+.user-list {
+    background-color: #3b3b3b;
+    padding: 20px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.5);
+}
+
+.user-list h2 {
+    font-size: 24px;
+    margin-bottom: 20px;
+}
+
+.user-list ul {
+    list-style-type: none;
+    padding: 0;
+}
+
