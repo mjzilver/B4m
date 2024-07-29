@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { Channel } from '../types/channel';
-import { User } from '../types/user';
+import { User, UserLogin } from '../types/user';
 import { WebsocketService } from './websocket.service';
 
 @Component({
@@ -14,15 +14,12 @@ export class AppComponent implements OnInit {
   users: User[] = [];
   connectionReady = false;
 
-  currentUser: User = new User(1, "Admin", "Admin", Date.now(), "red");
-  loggedIn = true;
-
+  currentUser: User | null = new User(1, "Admin", "Admin", Date.now(), "red");
   selectedChannel: Channel | null = null;
 
   constructor(private websocketService: WebsocketService) {}
 
   ngOnInit(): void {
-    // Subscribe to connection status
     this.websocketService.connectionStatus$.subscribe(status => {
       this.connectionReady = status;
 
@@ -41,12 +38,14 @@ export class AppComponent implements OnInit {
     });
   }
 
-  login(): void {
-    console.log('Log in button clicked');
+  login(user: UserLogin): void {
+    // check with the server if the user exists
+    this.currentUser = this.users.find(u => u.name === user.name && u.password === user.password) ?? null;
   }
 
   logout(): void {
-    console.log('Log out button clicked');
+    this.currentUser = null;
+    this.selectedChannel = null; 
   }
 
   selectChannel(channel: Channel): void {

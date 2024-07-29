@@ -1,9 +1,8 @@
-<div *ngIf="!loggedIn" class="auth-container">
-  <button class="button button-login" (click)="login()">Login</button>
-</div>
+<app-user-login *ngIf="currentUser === null" (login)="login($event)"></app-user-login>
 
-<div *ngIf="loggedIn" class="app-container">
-  <button class="button button-logout" (click)="logout()">Logout</button>
+<app-user-logout *ngIf="currentUser !== null" [currentUser]="currentUser" (logout)="logout()"> </app-user-logout>
+
+<div *ngIf="currentUser !== null" class="app-container">
   <div class="channels-card">
     <h2 class="channels-card-title">Channels</h2>
     <ul class="channels-card-list">
