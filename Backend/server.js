@@ -67,6 +67,7 @@ class WebSocketServer {
 		console.log("Client disconnected");
 		const currentUser = this.memoryStore.getCurrentUser(socket);
 		if (currentUser) {
+			currentUser.channel = null;
 			this.logout(currentUser.user, currentUser.channel);
 		}
 	}
@@ -84,8 +85,6 @@ class WebSocketServer {
 
 	getMessages(channelId, socket) {
 		this.database.getAllMessages(channelId).then((messages) => {
-		
-
 			socket.send(JSON.stringify({
 				command: "messages",
 				channelId,
@@ -96,6 +95,11 @@ class WebSocketServer {
 
 	getChannels(socket) {
 		this.database.getAllChannels().then((channels) => {
+			// Add in-memory users to channels
+			channels.forEach((channel) => {
+				channel.users = this.memoryStore.getChannelUsers(channel);
+			});
+
 			socket.send(JSON.stringify({
 				command: "channels",
 				channels: channels
@@ -103,28 +107,9 @@ class WebSocketServer {
 		});
 	}
 
-	getChannelUsers(channel) {
-		console.log("Getting users for channel", channel);
-		let users = this.memoryStore.users.filter((user) => user.channel && user.channel.id === channel.id);
-		return users.map((user) => user.data);
-	}
-
-	setUserChannel(user, channel) {
-		let currentUser = this.memoryStore.getCurrentUser(user);
-		if (currentUser) {
-			currentUser.channel = channel;
-		}
-
-		this.memoryStore.users.forEach((u) => {
-			if (u.data.id === user.id) {
-				u.channel = channel;
-			}
-		});
-	}
-
 	joinChannel(channel, user) {
-		this.setUserChannel(user, channel);
-		channel.users = this.getChannelUsers(channel);
+		this.memoryStore.addUserToChannel(user, channel);
+		channel.users = this.memoryStore.getChannelUsers(channel);
 
 		this.server.clients.forEach((client) => {
 			if (client.readyState === WebSocket.OPEN) {
@@ -134,10 +119,8 @@ class WebSocketServer {
 	}
 
 	leaveChannel(channel, user) {
-		this.setUserChannel(user, null);
-		channel.users = this.getChannelUsers(channel);
-
-		console.log("Channel users", channel.users);
+		this.memoryStore.removeUserFromChannel(user);
+		channel.users = this.memoryStore.getChannelUsers(channel);
 
 		this.server.clients.forEach((client) => {
 			if (client.readyState === WebSocket.OPEN) {

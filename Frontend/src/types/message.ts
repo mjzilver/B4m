@@ -19,22 +19,3 @@ export class Message {
 		this.channel = channel;
 	}
 }
-
-export class MessageData {
-	user_id: number;
-	text: string;
-	channel_id: number;
-	time: number;
-
-	constructor(
-		user_id: number,
-		text: string,
-		channel_id: number,
-		time: number = Date.now()
-	) {
-		this.user_id = user_id;
-		this.text = text;
-		this.channel_id = channel_id;
-		this.time = time;
-	}
-}
