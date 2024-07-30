@@ -5,6 +5,10 @@ const server = new WebSocket.Server({ port: 3000 });
 // *** WebSocket server ***
 // soon will be replaced with Dotnet :) 
 
+const memoryStore = {
+	users: []
+};
+
 server.on("connection", (socket) => {
 	console.log("Client connected");
 
@@ -37,6 +41,9 @@ server.on("connection", (socket) => {
 			case "loginUser":
 				login(parsedMessage.user, socket);
 				break;
+			case "logoutUser":
+				logout(parsedMessage.user, parsedMessage.channel);
+				break;
 			case "registerUser":
 				register(parsedMessage.user, socket);
 				break;
@@ -50,6 +57,15 @@ server.on("connection", (socket) => {
 
 	socket.on("close", () => {
 		console.log("Client disconnected");
+
+		let currentUser = getCurrentUser(socket);
+
+		if (currentUser) {
+			logout(currentUser.user, currentUser.channel);
+		}
+
+		// Close the connection
+		socket.close();
 	});
 });
 
@@ -108,25 +124,56 @@ function getChannels(socket) {
 	});
 }
 
+function getChannelUsers(channel) {
+	console.log("Getting users for channel", channel);
+	console.log("Memory store", memoryStore.users);
+	let users = memoryStore.users.filter((user) => user.channel && user.channel.id === channel.id);
+	return users.map((user) => user.data);
+}
+
+function setUserChannel(user, channel) {
+	let currentUser = getCurrentUser(user);
+	if (currentUser) {
+		currentUser.channel = channel;
+	}
+
+	memoryStore.users.forEach((u) => {
+		if (u.data.id === user.id) {
+			u.channel = channel;
+		}
+	});
+}
+
 function joinChannel(channel, user) {
+	setUserChannel(user, channel);
+
+	channel.users = getChannelUsers(channel);
+
 	// broadcast to all clients that user joined the channel
 	server.clients.forEach((client) => {
 		if (client.readyState === WebSocket.OPEN) {
-			client.send(JSON.stringify({ command: "userJoinedChannel", channel, user}));
+			client.send(JSON.stringify({ command: "userJoinedChannel", channel, user }));
 		}
 	});
 }
 
 function leaveChannel(channel, user) {
+	setUserChannel(user, null);
+
+	channel.users = getChannelUsers(channel);
+
+	console.log("Channel users", channel.users);
+
 	// broadcast to all clients that user left the channel
 	server.clients.forEach((client) => {
 		if (client.readyState === WebSocket.OPEN) {
-			client.send(JSON.stringify({ command: "userLeftChannel", channel, user}));
+			client.send(JSON.stringify({ command: "userLeftChannel", channel, user }));
 		}
 	});
 }
 
 function getUsers(socket) {
+	// get all users from database
 	db.all("SELECT id, name, joined, color FROM user", (err, rows) => {
 		if (err) {
 			console.error(err.message);
@@ -141,6 +188,14 @@ function getUsers(socket) {
 	});
 }
 
+function logout(user, channel) {
+	if (channel)
+		leaveChannel(channel, user);
+	// remove user from memoryStore
+	removeUser(user);
+}
+
+
 function login(user, socket) {
 	db.get("SELECT id, name, joined, color FROM user WHERE name = ? AND password = ?", [user.name, user.password], (err, row) => {
 		if (err) {
@@ -153,6 +208,8 @@ function login(user, socket) {
 				command: "login",
 				user: row
 			}));
+
+			storeUser(row, socket);
 		} else {
 			socket.send(JSON.stringify({
 				command: "login",
@@ -216,9 +273,32 @@ function createUser(user, socket) {
 					command: "register",
 					user: row
 				}));
+
+				storeUser(row, socket);
 			});
 		}
 	);
+}
+
+function storeUser(user, socket) {
+	memoryStore.users.push({
+		data: user,
+		socket: socket
+	});
+}
+
+function removeUser(user) {
+	if(!user) return;
+
+	let currentUser = memoryStore.users.find((u) => u.data.id === user.id);
+	if (currentUser) {
+		memoryStore.users.splice(memoryStore.users.indexOf(currentUser), 1);
+	}
+}
+
+// returns the stored user object for the given socket
+function getCurrentUser(socket) {
+	return memoryStore.users.find((user) => user.socket === socket);
 }
 
 // Initialize SQLite database
@@ -238,7 +318,7 @@ let db = new sqlite3.Database("./forum.db", (err) => {
       color TEXT NOT NULL
     )`
 	);
-  
+
 	db.run(
 		`CREATE TABLE IF NOT EXISTS channel (
       id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -248,7 +328,7 @@ let db = new sqlite3.Database("./forum.db", (err) => {
       password TEXT
     )`
 	);
-  
+
 	db.run(
 		`CREATE TABLE IF NOT EXISTS message (
       id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -259,5 +339,6 @@ let db = new sqlite3.Database("./forum.db", (err) => {
     )`
 	);
 });
+
 
 console.log("WebSocket server is running on ws://localhost:3000");

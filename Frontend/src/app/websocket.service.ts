@@ -64,11 +64,10 @@ export class WebsocketService {
 				this.channelSubject.next(this.channels);
 				break;
 			case 'userJoinedChannel':
-				this.channels.find((c) => c.id === parsed.channel!.id)?.users.push(parsed.user!);
-				this.channelSubject.next(this.channels);
+				this.channelUpdate(parsed);
 				break;
 			case 'userLeftChannel':
-				this.userLeftChannel(parsed);
+				this.channelUpdate(parsed);
 				break;
 			case 'users':
 				this.users = this.parseUsers(parsed.users!);
@@ -93,6 +92,7 @@ export class WebsocketService {
 		this.ws.onclose = () => {
 			console.log('WebSocket connection closed');
 			this.connectionStatusSubject.next(false);
+
 			// Attempt to reconnect after a delay
 			setTimeout(() => this.connect(), 1000);
 		};
@@ -104,8 +104,8 @@ export class WebsocketService {
 
 	parseMessages(data: SocketMessage[]) {
 		data.forEach((item: SocketMessage) => {
-			const user = this.users.find((u) => u.id === item.user_id);
 			const channel = this.channels.find((c) => c.id === item.channel_id);
+			const user = this.users.find((u) => u.id === item.user_id);
 
 			if (user && channel) {
 				const message = new Message(user, item.text, item.time, channel);
@@ -131,6 +131,15 @@ export class WebsocketService {
 			(item) =>
 				new Channel(item.id, item.name, item.color, item.created, item.password)
 		);
+	}
+
+	private channelUpdate(data: SocketResponse) {
+		const channel = this.channels.find((c) => c.id === data.channel!.id);
+		const channelUsers = data.channel?.users;
+
+		if (channel && channelUsers) {
+			channel.users = this.parseUsers(channelUsers);
+		}
 	}
 
 	private userLeftChannel(data: SocketResponse) {
@@ -214,15 +223,17 @@ export class WebsocketService {
 
 	loginResponse(user: SocketUser | undefined, newUser = false) {
 		if (newUser) {
-			console.log('Registration successful');
 			const registeredUser = new User(user!.id, user!.name, user!.joined, user!.color);
-
 			this.currentUserSubject.next(registeredUser);
 		} else if (user) {
-			console.log('Login successful');
 			const loggedInUser = new User(user.id, user.name, user.joined, user.color);
-
 			this.currentUserSubject.next(loggedInUser);
+		}
+	}
+
+	logout(user: User, channel: Channel | null) {
+		if (channel) {
+			this.leaveChannel(channel, user);
 		}
 	}
 

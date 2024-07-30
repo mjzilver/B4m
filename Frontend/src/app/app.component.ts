@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { Channel } from '../types/channel';
 import { User, UserLogin } from '../types/user';
 import { WebsocketService } from './websocket.service';
@@ -8,7 +8,7 @@ import { WebsocketService } from './websocket.service';
 	templateUrl: './app.component.html',
 	styleUrls: ['./app.component.css'],
 })
-export class AppComponent implements OnInit {
+export class AppComponent implements OnInit, OnDestroy {
 	title = 'frontend';
 	channels: Channel[] = [];
 	users: User[] = [];
@@ -19,6 +19,16 @@ export class AppComponent implements OnInit {
 	currentError: string | null = null;
 
 	constructor(private websocketService: WebsocketService) {}
+	ngOnDestroy(): void {
+		console.log('Destroying app component');
+		if (this.selectedChannel) {
+			this.websocketService.leaveChannel(this.selectedChannel, this.currentUser!);
+		}
+
+		if (this.currentUser) {
+			this.logout();
+		}
+	}
 
 	ngOnInit(): void {
 		this.websocketService.connectionStatus$.subscribe(status => {
@@ -32,6 +42,14 @@ export class AppComponent implements OnInit {
 
 		this.websocketService.channels$.subscribe((channels: Channel[]) => {
 			this.channels = channels; 
+
+			// update user list	
+			channels.forEach(channel => {
+				if(channel.id === this.selectedChannel?.id) {
+					// add users from channel to userlist
+					this.users = channel.users;
+				}
+			});
 		});
 
 		this.websocketService.users$.subscribe((users: User[]) => {
@@ -58,6 +76,8 @@ export class AppComponent implements OnInit {
 	}
 
 	logout(): void {
+		this.websocketService.logout(this.currentUser!, this.selectedChannel);
+
 		this.currentUser = null;
 		this.selectedChannel = null; 
 	}
@@ -69,16 +89,12 @@ export class AppComponent implements OnInit {
 		}
 
 		channel.messages = [];
-		// leave old one
 		if (this.selectedChannel) {
 			this.websocketService.leaveChannel(this.selectedChannel, this.currentUser!);
 		}
 
 		this.selectedChannel = channel;
-		
 		this.websocketService.getMessages(channel);
-
-		// add the user to the channel
 		this.websocketService.joinChannel(channel, this.currentUser!);
 	}
 }

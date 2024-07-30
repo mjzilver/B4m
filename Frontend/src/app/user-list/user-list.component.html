@@ -1,8 +1,10 @@
 <div class="user-list">
-<p>Current users:</p>
+@if(users.length !== 0) {
+  <p>Users connected to chosen channel:</p>
   <ul>
     @for (user of users; track user.id) {
       <li>{{ user.name }}</li>
     } 
   </ul>
+}
 </div>

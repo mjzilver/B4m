@@ -23,6 +23,7 @@ export interface SocketChannel {
     color: string;
     created: number;
     password?: string;
+    users?: Array<SocketUser>;
 }
 
 export interface SocketMessage {

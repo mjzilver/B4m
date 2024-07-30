@@ -29,9 +29,12 @@
     </ul>
   </div>
   <div class="user-chat-container">
-    <app-user-list [users]="users"></app-user-list>
+
     @if (selectedChannel) {
+    <app-user-list [users]="selectedChannel.users"></app-user-list>
     <app-chat [channel]="selectedChannel" [user]="currentUser"></app-chat>
+    } @else {
+    <app-user-list [users]="[]"></app-user-list>
     }
   </div>
 </div>
