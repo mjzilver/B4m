@@ -10,6 +10,7 @@ import { WebsocketService } from './websocket.service';
 import { UserListComponent } from './user-list/user-list.component';
 import { UserLoginComponent } from './user-login/user-login.component';
 import { UserLogoutComponent } from './user-logout/user-logout.component';
+import { ChannelListComponent } from './channel-list/channel-list.component';
 
 const routes: Routes = [
 	{ path: '', component: AppComponent },
@@ -21,7 +22,8 @@ const routes: Routes = [
 		ChatComponent,
 		UserListComponent,
 		UserLoginComponent,
-		UserLogoutComponent
+		UserLogoutComponent,
+		ChannelListComponent
 	],
 	imports: [
 		BrowserModule,

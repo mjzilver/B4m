@@ -16,7 +16,6 @@ class WebSocketServer {
 
 	setupWebSocket() {
 		this.server.on("connection", (socket) => {
-			console.log("Client connected");
 			socket.on("message", (message) => this.handleMessage(message, socket));
 			socket.on("close", () => this.handleClose(socket));
 		});
@@ -78,7 +77,6 @@ class WebSocketServer {
 				client.send(JSON.stringify({ command: "broadcast", message }));
 			}
 		});
-		console.log("Message broadcasted:", message);
 
 		this.database.insertMessage(message);
 	}

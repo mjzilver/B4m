@@ -20,7 +20,6 @@ export class AppComponent implements OnInit, OnDestroy {
 
 	constructor(private websocketService: WebsocketService) {}
 	ngOnDestroy(): void {
-		console.log('Destroying app component');
 		if (this.selectedChannel) {
 			this.websocketService.leaveChannel(this.selectedChannel, this.currentUser!);
 		}
@@ -62,8 +61,6 @@ export class AppComponent implements OnInit, OnDestroy {
 	}
 
 	login(user: UserLogin): void {
-		console.log('Logging in', user);
-
 		if(user.existingUser) {
 			this.websocketService.attemptLogin(user);
 		} else {

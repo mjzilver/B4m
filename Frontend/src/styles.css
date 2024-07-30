@@ -9,6 +9,7 @@ body {
 .app-container {
     display: flex;
     height: 100vh;
+    overflow: hidden;
 }
 
 .button {
@@ -34,33 +35,6 @@ body {
     position: absolute;
     top: 20px;
     right: 20px;
-}
-
-.channels-card {
-    background-color: #3b3b3b;
-    width: 20%;
-    padding: 20px;
-    box-shadow: 2px 0 5px rgba(0,0,0,0.5);
-}
-
-.channels-card-title {
-    font-size: 24px;
-    margin-bottom: 20px;
-}
-
-.channels-card-list {
-    list-style-type: none;
-    padding: 0;
-}
-
-.channels-card-item {
-    margin-bottom: 10px;
-}
-
-.channels-card-item .button-channel {
-    width: 100%;
-    display: flex;
-    justify-content: space-between;
 }
 
 .user-chat-container {

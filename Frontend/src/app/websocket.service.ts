@@ -82,12 +82,10 @@ export class WebsocketService {
 	}
 
 	private handleOpen(): void {
-		console.log('WebSocket connection established');
 		this.connectionStatusSubject.next(true);
 	}
 
 	private handleClose(): void {
-		console.log('WebSocket connection closed');
 		this.connectionStatusSubject.next(false);
 
 		// Attempt to reconnect after a delay
@@ -182,7 +180,7 @@ export class WebsocketService {
 		if (this.ws.readyState === WebSocket.OPEN) {
 			this.ws.send(JSON.stringify(obj));
 		} else {
-			console.log('WebSocket not open');
+			console.warn('WebSocket not open');
 		}
 	}
 }

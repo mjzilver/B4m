@@ -13,10 +13,11 @@ module.exports = class MemoryStore {
 	}
 
 	addUserToChannel(user, channel) {
-		var found = this.getChannelById(channel.id)
+		var foundChannel = this.getChannelById(channel.id)
 		
-		if(found) {
-			found.users.push(user);
+		if(foundChannel) {
+			if (foundChannel.users.find((u) => u.id === user.id)) return;
+			foundChannel.users.push(user);
 			return;
 		} else {
 			// if not found add new channel
