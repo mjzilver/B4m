@@ -1,30 +1,36 @@
+@if (currentError !== null) {
+<div class="error-container">
+  <div class="error-card">
+    <h2 class="error-card-title">Error</h2>
+    <p class="error-card-message">{{ currentError }}</p>
+  </div>
+</div>
+}
+
 @if (currentUser === null) {
-  <app-user-login (login)="login($event)"></app-user-login>
+<app-user-login (login)="login($event)"></app-user-login>
 }
 @if (currentUser !== null) {
-  <app-user-logout [currentUser]="currentUser" (logout)="logout()"> </app-user-logout>
+<app-user-logout [currentUser]="currentUser" (logout)="logout()"> </app-user-logout>
 
-  <div class="app-container">
-    <div class="channels-card">
-      <h2 class="channels-card-title">Channels</h2>
-      <ul class="channels-card-list">
-        <li *ngFor="let channel of channels" class="channels-card-item">
-          <button 
-            class="button button-channel" 
-            (click)="selectChannel(channel)"
-            [ngClass]="{'selected-channel': channel.id === selectedChannel?.id}"
-          >
-            <span class="channels-card-name">{{ channel.name }}</span>
-            <span class="channels-card-users">({{ channel.users.length }} users)</span>
-          </button>
-        </li>
-      </ul>
-    </div>
-    <div class="user-chat-container">
-      <app-user-list [users]="users"></app-user-list>
-      @if (selectedChannel) {
-        <app-chat [channel]="selectedChannel" [user]="currentUser"></app-chat>
-      }
-    </div>
+<div class="app-container">
+  <div class="channels-card">
+    <h2 class="channels-card-title">Channels</h2>
+    <ul class="channels-card-list">
+      <li *ngFor="let channel of channels" class="channels-card-item">
+        <button class="button button-channel" (click)="selectChannel(channel)"
+          [ngClass]="{'selected-channel': channel.id === selectedChannel?.id}">
+          <span class="channels-card-name">{{ channel.name }}</span>
+          <span class="channels-card-users">({{ channel.users.length }} users)</span>
+        </button>
+      </li>
+    </ul>
   </div>
+  <div class="user-chat-container">
+    <app-user-list [users]="users"></app-user-list>
+    @if (selectedChannel) {
+    <app-chat [channel]="selectedChannel" [user]="currentUser"></app-chat>
+    }
+  </div>
+</div>
 }

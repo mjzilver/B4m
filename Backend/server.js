@@ -2,6 +2,9 @@ const WebSocket = require("ws");
 const sqlite3 = require("sqlite3").verbose();
 const server = new WebSocket.Server({ port: 3000 });
 
+// *** WebSocket server ***
+// soon will be replaced with Dotnet :) 
+
 server.on("connection", (socket) => {
 	console.log("Client connected");
 
@@ -85,7 +88,7 @@ function getMessages(channelId, socket) {
 }
 
 function getChannels(socket) {
-	db.all("SELECT * FROM channel", (err, rows) => {
+	db.all("SELECT id, name, created, color FROM channel", (err, rows) => {
 		if (err) {
 			console.error(err.message);
 			return;
@@ -101,7 +104,7 @@ function getChannels(socket) {
 
 
 function getUsers(socket) {
-	db.all("SELECT * FROM user", (err, rows) => {
+	db.all("SELECT id, name, joined, color FROM user", (err, rows) => {
 		if (err) {
 			console.error(err.message);
 			return;
@@ -116,23 +119,16 @@ function getUsers(socket) {
 }
 
 function login(user, socket) {
-	db.get("SELECT * FROM user WHERE name = ? AND password = ?", [user.name, user.password], (err, row) => {
+	db.get("SELECT id, name, joined, color FROM user WHERE name = ? AND password = ?", [user.name, user.password], (err, row) => {
 		if (err) {
 			console.error(err.message);
 			return;
 		}
 
 		if (row) {
-			const user = {
-				id: row.id,
-				name: row.name,
-				joined: row.joined,
-				color: row.color
-			} // remove password from user object
-
 			socket.send(JSON.stringify({
 				command: "login",
-				user: user
+				user: row
 			}));
 		} else {
 			socket.send(JSON.stringify({
@@ -187,22 +183,15 @@ function createUser(user, socket) {
 				return;
 			}
 
-			db.get("SELECT * FROM user WHERE name = ?", [user.name], (err, row) => {
+			db.get("SELECT id, name, joined, color FROM user WHERE name = ?", [user.name], (err, row) => {
 				if (err) {
 					console.error(err.message);
 					return;
 				}
 
-				const user = {
-					id: row.id,
-					name: row.name,
-					joined: row.joined,
-					color: row.color
-				} // remove password from user object
-
 				socket.send(JSON.stringify({
 					command: "register",
-					user: user
+					user: row
 				}));
 			});
 		}

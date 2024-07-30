@@ -16,6 +16,7 @@ export class AppComponent implements OnInit {
 
 	currentUser: User | null = null;
 	selectedChannel: Channel | null = null;
+	currentError: string | null = null;
 
 	constructor(private websocketService: WebsocketService) {}
 
@@ -35,6 +36,10 @@ export class AppComponent implements OnInit {
 
 		this.websocketService.users$.subscribe((users: User[]) => {
 			this.users = users;
+		});
+
+		this.websocketService.currentError$.subscribe((error: string | null) => {
+			this.currentError = error;
 		});
 	}
 

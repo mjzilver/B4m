@@ -20,12 +20,14 @@ export class WebsocketService {
 	private userSubject = new Subject<User[]>();
 	private connectionStatusSubject = new Subject<boolean>();
 	private currentUserSubject = new Subject<User | null>();
+	private errorSubject = new Subject<string|null>();
 
 	messages$ = this.messageSubject.asObservable();
 	channels$ = this.channelSubject.asObservable();
 	users$ = this.userSubject.asObservable();
 	connectionStatus$ = this.connectionStatusSubject.asObservable();
 	currentUser$ = this.currentUserSubject.asObservable();
+	currentError$ = this.errorSubject.asObservable();
 
 	channels: Channel[] = [];
 	users: User[] = [];
@@ -44,7 +46,10 @@ export class WebsocketService {
 
 			if(parsed.error) {
 				console.error(parsed.error);
+				this.errorSubject.next(parsed.error);
 				return;
+			} else {
+				this.errorSubject.next(null);
 			}
 
 			switch (parsed.command) {

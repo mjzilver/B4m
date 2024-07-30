@@ -1,4 +1,4 @@
-import { Component, Input, OnInit, OnDestroy, ChangeDetectorRef } from '@angular/core';
+import { Component, Input, OnInit, OnDestroy, ChangeDetectorRef, ViewChild, ElementRef } from '@angular/core';
 import { WebsocketService } from '../websocket.service';
 import { Message } from '../../types/message';
 import { Channel } from '../../types/channel';
@@ -11,50 +11,60 @@ import { Subscription } from 'rxjs';
 	styleUrls: ['./chat.component.css'],
 })
 export class ChatComponent implements OnInit, OnDestroy {
-  @Input() channel!: Channel;
-  @Input() user!: User;
+	@Input() channel!: Channel;
+	@Input() user!: User;
 
-  messages: Message[] = [];
-  newMessage: string = '';
-  private messagesSubscription!: Subscription;
+	@ViewChild('messageContainer') private messageContainer!: ElementRef;
 
-  constructor(
-    private websocketService: WebsocketService,
-    private cd: ChangeDetectorRef
-  ) {}
+	messages: Message[] = [];
+	newMessage: string = '';
+	private messagesSubscription!: Subscription;
 
-  ngOnInit(): void {
-  	this.messages = []; 
+	constructor(
+		private websocketService: WebsocketService,
+		private cd: ChangeDetectorRef
+	) { }
 
-  	// Subscribe to WebSocket messages
-  	this.messagesSubscription = this.websocketService.messages$.subscribe((message) => {
-  		if (message.channel?.id === this.channel.id) {
-  			this.messages.push(message);
-  			this.cd.detectChanges(); 
-  		}
-  	});
-  }
+	ngOnInit(): void {
+		this.messages = [];
 
-  ngOnDestroy(): void {
-  	if (this.messagesSubscription) {
-  		this.messagesSubscription.unsubscribe();
-  	}
-  }
+		// Subscribe to WebSocket messages
+		this.messagesSubscription = this.websocketService.messages$.subscribe((message) => {
+			if (message.channel?.id === this.channel.id) {
+				this.messages.push(message);
+				this.cd.detectChanges();
+				this.scrollToBottom();
+			}
+		});
+	}
 
-  ngOnChanges(): void {
-  	if (this.channel) {
-  		this.messages = [];
-  		this.cd.detectChanges(); 
-  	}
-  }
+	ngOnDestroy(): void {
+		if (this.messagesSubscription) {
+			this.messagesSubscription.unsubscribe();
+		}
+	}
 
-  sendMessage(): void {
-  	if (this.newMessage.trim()) {
-  		const message = new Message(this.user, this.newMessage, Date.now(), this.channel);
+	ngOnChanges(): void {
+		if (this.channel) {
+			this.messages = [];
+			this.cd.detectChanges();
+		}
+	}
 
-  		this.websocketService.sendMessage(message);
-  		this.newMessage = '';
-  		this.cd.detectChanges(); 
-  	}
-  }
+	sendMessage(): void {
+		if (this.newMessage.trim()) {
+			const message = new Message(this.user, this.newMessage, Date.now(), this.channel);
+
+			this.websocketService.sendMessage(message);
+			this.newMessage = '';
+			this.cd.detectChanges();
+		}
+	}
+	private scrollToBottom(): void {
+		try {
+			this.messageContainer.nativeElement.scrollTop = this.messageContainer.nativeElement.scrollHeight;
+		} catch (err) {
+			console.error('Scroll to bottom failed:', err);
+		}
+	}
 }

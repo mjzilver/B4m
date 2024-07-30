@@ -1,4 +1,15 @@
 .selected-channel {
   font-weight: bold;
-  border: 1px solid #ffffff; 
+  border: 1px solid #ffffff;
+}
+
+.error-container {
+  color: #ff0000;
+  font-size: 14px;
+  margin-top: 10px;
+
+  position: absolute;
+  top: 0;
+  text-align: center;
+  width: 100%;
 }
