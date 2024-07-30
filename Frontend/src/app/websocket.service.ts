@@ -20,7 +20,7 @@ export class WebsocketService {
 	private userSubject = new Subject<User[]>();
 	private connectionStatusSubject = new Subject<boolean>();
 	private currentUserSubject = new Subject<User | null>();
-	private errorSubject = new Subject<string|null>();
+	private errorSubject = new Subject<string | null>();
 
 	messages$ = this.messageSubject.asObservable();
 	channels$ = this.channelSubject.asObservable();
@@ -44,7 +44,7 @@ export class WebsocketService {
 
 			console.log(`Received message: ${JSON.stringify(parsed)}`);
 
-			if(parsed.error) {
+			if (parsed.error) {
 				console.error(parsed.error);
 				this.errorSubject.next(parsed.error);
 				return;
@@ -62,6 +62,13 @@ export class WebsocketService {
 			case 'channels':
 				this.channels = this.parseChannels(parsed.channels!);
 				this.channelSubject.next(this.channels);
+				break;
+			case 'userJoinedChannel':
+				this.channels.find((c) => c.id === parsed.channel!.id)?.users.push(parsed.user!);
+				this.channelSubject.next(this.channels);
+				break;
+			case 'userLeftChannel':
+				this.userLeftChannel(parsed);
 				break;
 			case 'users':
 				this.users = this.parseUsers(parsed.users!);
@@ -126,6 +133,16 @@ export class WebsocketService {
 		);
 	}
 
+	private userLeftChannel(data: SocketResponse) {
+		const channel = this.channels.find((c) => c.id === data.channel!.id);
+		const user = channel?.users.find((u) => u.id === data.user!.id);
+
+		if (channel && user) {
+			const index = channel.users.indexOf(user);
+			channel.users.splice(index, 1);
+		}
+	}
+
 	private parseUsers(data: SocketUser[]): User[] {
 		return data.map(
 			(item) => new User(item.id, item.name, item.joined, item.color)
@@ -157,10 +174,21 @@ export class WebsocketService {
 		this.sendObject(messageObject);
 	}
 
-	joinChannel(channel: Channel) {
+	joinChannel(channel: Channel, user: User) {
 		const messageObject = {
 			command: 'joinChannel',
 			channel: channel,
+			user: user,
+		};
+
+		this.sendObject(messageObject);
+	}
+
+	leaveChannel(channel: Channel, user: User) {
+		const messageObject = {
+			command: 'leaveChannel',
+			channel: channel,
+			user: user,
 		};
 
 		this.sendObject(messageObject);
@@ -195,7 +223,7 @@ export class WebsocketService {
 			const loggedInUser = new User(user.id, user.name, user.joined, user.color);
 
 			this.currentUserSubject.next(loggedInUser);
-		} 
+		}
 	}
 
 	registerUser(user: UserLogin) {

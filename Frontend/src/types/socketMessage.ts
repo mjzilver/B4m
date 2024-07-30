@@ -3,6 +3,7 @@ export interface SocketResponse {
     message?: SocketMessage;
     messages?: Array<SocketMessage>;
     channels?: Array<SocketChannel>;
+    channel?: SocketChannel;
     users?: Array<SocketUser>;
     user?: SocketUser;
     error?: string;

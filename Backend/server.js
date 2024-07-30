@@ -25,6 +25,12 @@ server.on("connection", (socket) => {
 			case "getChannels":
 				getChannels(socket);
 				break;
+			case "joinChannel":
+				joinChannel(parsedMessage.channel, parsedMessage.user);
+				break;
+			case "leaveChannel":
+				leaveChannel(parsedMessage.channel, parsedMessage.user);
+				break;
 			case "getUsers":
 				getUsers(socket);
 				break;
@@ -102,6 +108,23 @@ function getChannels(socket) {
 	});
 }
 
+function joinChannel(channel, user) {
+	// broadcast to all clients that user joined the channel
+	server.clients.forEach((client) => {
+		if (client.readyState === WebSocket.OPEN) {
+			client.send(JSON.stringify({ command: "userJoinedChannel", channel, user}));
+		}
+	});
+}
+
+function leaveChannel(channel, user) {
+	// broadcast to all clients that user left the channel
+	server.clients.forEach((client) => {
+		if (client.readyState === WebSocket.OPEN) {
+			client.send(JSON.stringify({ command: "userLeftChannel", channel, user}));
+		}
+	});
+}
 
 function getUsers(socket) {
 	db.all("SELECT id, name, joined, color FROM user", (err, rows) => {

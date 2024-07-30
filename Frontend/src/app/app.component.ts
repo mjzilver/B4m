@@ -63,11 +63,22 @@ export class AppComponent implements OnInit {
 	}
 
 	selectChannel(channel: Channel): void {
+		if (!this.currentUser) {
+			console.error('No user selected');
+			return;
+		}
+
 		channel.messages = [];
+		// leave old one
+		if (this.selectedChannel) {
+			this.websocketService.leaveChannel(this.selectedChannel, this.currentUser!);
+		}
+
 		this.selectedChannel = channel;
+		
 		this.websocketService.getMessages(channel);
 
 		// add the user to the channel
-		this.websocketService.joinChannel(channel);
+		this.websocketService.joinChannel(channel, this.currentUser!);
 	}
 }
