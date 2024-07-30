@@ -1,14 +1,9 @@
 import { Injectable } from '@angular/core';
-import { Subject } from 'rxjs';
+import { Subject, Observable } from 'rxjs';
 import { Message } from '../types/message';
 import { User, UserLogin } from '../types/user';
 import { Channel } from '../types/channel';
-import {
-	SocketChannel,
-	SocketMessage,
-	SocketResponse,
-	SocketUser,
-} from '../types/socketMessage';
+import { SocketChannel, SocketMessage, SocketResponse, SocketUser } from '../types/socketMessage';
 
 @Injectable({
 	providedIn: 'root',
@@ -22,90 +17,91 @@ export class WebsocketService {
 	private currentUserSubject = new Subject<User | null>();
 	private errorSubject = new Subject<string | null>();
 
-	messages$ = this.messageSubject.asObservable();
-	channels$ = this.channelSubject.asObservable();
-	users$ = this.userSubject.asObservable();
-	connectionStatus$ = this.connectionStatusSubject.asObservable();
-	currentUser$ = this.currentUserSubject.asObservable();
-	currentError$ = this.errorSubject.asObservable();
+	messages$: Observable<Message> = this.messageSubject.asObservable();
+	channels$: Observable<Channel[]> = this.channelSubject.asObservable();
+	users$: Observable<User[]> = this.userSubject.asObservable();
+	connectionStatus$: Observable<boolean> = this.connectionStatusSubject.asObservable();
+	currentUser$: Observable<User | null> = this.currentUserSubject.asObservable();
+	currentError$: Observable<string | null> = this.errorSubject.asObservable();
 
-	channels: Channel[] = [];
-	users: User[] = [];
+	private channels: Channel[] = [];
+	private users: User[] = [];
 
 	constructor() {
 		this.connect();
 	}
 
-	private connect() {
+	private connect(): void {
 		this.ws = new WebSocket('ws://localhost:3000');
 
-		this.ws.onmessage = async (event: MessageEvent) => {
-			const parsed: SocketResponse = JSON.parse(event.data);
-
-			console.log(`Received message: ${JSON.stringify(parsed)}`);
-
-			if (parsed.error) {
-				console.error(parsed.error);
-				this.errorSubject.next(parsed.error);
-				return;
-			} else {
-				this.errorSubject.next(null);
-			}
-
-			switch (parsed.command) {
-			case 'broadcast':
-				this.messageSubject.next(this.parseMessage(parsed.message!));
-				break;
-			case 'messages':
-				this.parseMessages(parsed.messages!);
-				break;
-			case 'channels':
-				this.channels = this.parseChannels(parsed.channels!);
-				this.channelSubject.next(this.channels);
-				break;
-			case 'userJoinedChannel':
-				this.channelUpdate(parsed);
-				break;
-			case 'userLeftChannel':
-				this.channelUpdate(parsed);
-				break;
-			case 'users':
-				this.users = this.parseUsers(parsed.users!);
-				this.userSubject.next(this.users);
-				break;
-			case 'login':
-				this.loginResponse(parsed.user);
-				break;
-			case 'register':
-				this.loginResponse(parsed.user, true);
-				break;
-			default:
-				console.warn(`Unknown command: ${parsed.command}`);
-			}
-		};
-
-		this.ws.onopen = () => {
-			console.log('WebSocket connection established');
-			this.connectionStatusSubject.next(true);
-		};
-
-		this.ws.onclose = () => {
-			console.log('WebSocket connection closed');
-			this.connectionStatusSubject.next(false);
-
-			// Attempt to reconnect after a delay
-			setTimeout(() => this.connect(), 1000);
-		};
-
-		this.ws.onerror = (error) => {
-			console.error('WebSocket error', error);
-		};
+		this.ws.onmessage = (event: MessageEvent) => this.handleMessage(event);
+		this.ws.onopen = () => this.handleOpen();
+		this.ws.onclose = () => this.handleClose();
+		this.ws.onerror = (error) => this.handleError(error);
 	}
 
-	parseMessages(data: SocketMessage[]) {
+	private handleMessage(event: MessageEvent): void {
+		const parsed: SocketResponse = JSON.parse(event.data);
+
+		console.log(`Received message: ${JSON.stringify(parsed)}`);
+
+		if (parsed.error) {
+			console.error(parsed.error);
+			this.errorSubject.next(parsed.error);
+			return;
+		}
+
+		this.errorSubject.next(null);
+
+		switch (parsed.command) {
+		case 'broadcast':
+			this.messageSubject.next(this.parseMessage(parsed.message!));
+			break;
+		case 'messages':
+			this.parseMessages(parsed.messages!);
+			break;
+		case 'channels':
+			this.channels = this.parseChannels(parsed.channels!);
+			this.channelSubject.next(this.channels);
+			break;
+		case 'userJoinedChannel':
+		case 'userLeftChannel':
+			this.updateChannelUsers(parsed);
+			break;
+		case 'users':
+			this.users = this.parseUsers(parsed.users!);
+			this.userSubject.next(this.users);
+			break;
+		case 'login':
+		case 'register':
+			this.handleLogin(parsed.user!);
+			break;
+		default:
+			console.warn(`Unknown command: ${parsed.command}`);
+		}
+	}
+
+	private handleOpen(): void {
+		console.log('WebSocket connection established');
+		this.connectionStatusSubject.next(true);
+	}
+
+	private handleClose(): void {
+		console.log('WebSocket connection closed');
+		this.connectionStatusSubject.next(false);
+
+		// Attempt to reconnect after a delay
+		setTimeout(() => this.connect(), 1000);
+	}
+
+	private handleError(error: Event): void {
+		console.error('WebSocket error', error);
+	}
+
+	private parseMessages(data: SocketMessage[]): void {
 		data.forEach((item: SocketMessage) => {
-			const channel = this.channels.find((c) => c.id === item.channel_id);
-			const user = this.users.find((u) => u.id === item.user_id);
+			const channel = this.channels.find(c => c.id === item.channel_id);
+			const user = this.users.find(u => u.id === item.user_id);
 
 			if (user && channel) {
 				const message = new Message(user, item.text, item.time, channel);
@@ -117,8 +113,8 @@ export class WebsocketService {
 	}
 
 	private parseMessage(data: SocketMessage): Message {
-		const user = this.users.find((u) => u.id === data.user!.id);
-		const channel = this.channels.find((c) => c.id === data.channel!.id);
+		const user = this.users.find(u => u.id === data.user!.id);
+		const channel = this.channels.find(c => c.id === data.channel!.id);
 
 		if (!user || !channel) {
 			throw new Error('User or Channel not found for message');
@@ -127,126 +123,62 @@ export class WebsocketService {
 	}
 
 	private parseChannels(data: SocketChannel[]): Channel[] {
-		return data.map(
-			(item) =>
-				new Channel(item.id, item.name, item.color, item.created, item.password)
-		);
+		return data.map(item => new Channel(item.id, item.name, item.color, item.created, item.password));
 	}
 
-	private channelUpdate(data: SocketResponse) {
-		const channel = this.channels.find((c) => c.id === data.channel!.id);
-		const channelUsers = data.channel?.users;
-
-		if (channel && channelUsers) {
-			channel.users = this.parseUsers(channelUsers);
-		}
-	}
-
-	private userLeftChannel(data: SocketResponse) {
-		const channel = this.channels.find((c) => c.id === data.channel!.id);
-		const user = channel?.users.find((u) => u.id === data.user!.id);
-
-		if (channel && user) {
-			const index = channel.users.indexOf(user);
-			channel.users.splice(index, 1);
+	private updateChannelUsers(data: SocketResponse): void {
+		const channel = this.channels.find(c => c.id === data.channel!.id);
+		if (channel) {
+			channel.users = this.parseUsers(data.channel!.users!);
 		}
 	}
 
 	private parseUsers(data: SocketUser[]): User[] {
-		return data.map(
-			(item) => new User(item.id, item.name, item.joined, item.color)
-		);
+		return data.map(item => new User(item.id, item.name, item.joined, item.color));
 	}
 
-	sendMessage(message: Message) {
-		const messageObject = {
-			command: 'broadcast',
-			message: message,
-		};
-
-		this.sendObject(messageObject);
+	private handleLogin(user: SocketUser): void {
+		const currentUser = new User(user.id, user.name, user.joined, user.color);
+		this.currentUserSubject.next(currentUser);
 	}
 
-	public getChannels() {
-		const messageObject = {
-			command: 'getChannels',
-		};
-
-		this.sendObject(messageObject);
+	sendMessage(message: Message): void {
+		this.sendObject({ command: 'broadcast', message });
 	}
 
-	public getUsers() {
-		const messageObject = {
-			command: 'getUsers',
-		};
-
-		this.sendObject(messageObject);
+	getChannels(): void {
+		this.sendObject({ command: 'getChannels' });
 	}
 
-	joinChannel(channel: Channel, user: User) {
-		const messageObject = {
-			command: 'joinChannel',
-			channel: channel,
-			user: user,
-		};
-
-		this.sendObject(messageObject);
+	getUsers(): void {
+		this.sendObject({ command: 'getUsers' });
 	}
 
-	leaveChannel(channel: Channel, user: User) {
-		const messageObject = {
-			command: 'leaveChannel',
-			channel: channel,
-			user: user,
-		};
-
-		this.sendObject(messageObject);
+	joinChannel(channel: Channel, user: User): void {
+		this.sendObject({ command: 'joinChannel', channel, user });
 	}
 
-	getMessages(channel: Channel) {
-		const messageObject = {
-			command: 'getMessages',
-			channel: channel,
-		};
-
-		this.sendObject(messageObject);
+	leaveChannel(channel: Channel, user: User): void {
+		this.sendObject({ command: 'leaveChannel', channel, user });
 	}
 
-	attemptLogin(user: UserLogin) {
-		const messageObject = {
-			command: 'loginUser',
-			user: user,
-		};
-
-		this.sendObject(messageObject);
+	getMessages(channel: Channel): void {
+		this.sendObject({ command: 'getMessages', channel });
 	}
 
-	loginResponse(user: SocketUser | undefined, newUser = false) {
-		if (newUser) {
-			const registeredUser = new User(user!.id, user!.name, user!.joined, user!.color);
-			this.currentUserSubject.next(registeredUser);
-		} else if (user) {
-			const loggedInUser = new User(user.id, user.name, user.joined, user.color);
-			this.currentUserSubject.next(loggedInUser);
-		}
+	attemptLogin(user: UserLogin): void {
+		this.sendObject({ command: 'loginUser', user });
 	}
 
-	logout(user: User, channel: Channel | null) {
-		if (channel) {
-			this.leaveChannel(channel, user);
-		}
+	registerUser(user: UserLogin): void {
+		this.sendObject({ command: 'registerUser', user });
 	}
 
-	registerUser(user: UserLogin) {
-		const messageObject = {
-			command: 'registerUser',
-			user: user,
-		};
-
-		this.sendObject(messageObject);
+	logout(user: User, channel: Channel | null): void {
+		this.sendObject({ command: 'logout', user, channel });
 	}
 
-	sendObject(obj: unknown) {
+	private sendObject(obj: unknown): void {
 		if (this.ws.readyState === WebSocket.OPEN) {
 			this.ws.send(JSON.stringify(obj));
 		} else {
