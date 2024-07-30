@@ -15,7 +15,6 @@ export class UserLoginComponent {
   }
 
   onRegister() {
-  	// mark as new user
   	this.newUser.existingUser = false;
 
   	this.login.emit(this.newUser);

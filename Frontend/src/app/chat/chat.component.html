@@ -1,14 +1,17 @@
 <div class="chat-room">
     <div class="chat-room-messages">
-        <div *ngFor="let message of messages" class="chat-room-message">
-            <div class="chat-room-message-header">
-                <span class="chat-room-message-user" [ngStyle]="{'color': message.user.color}">
-                    {{ message.user.name }}
-                </span>
-                <span class="chat-room-message-time">{{ message.time | date:'shortTime' }}</span>
+        @for(message of messages; track message.time) 
+        {
+            <div class="chat-room-message">
+                <div class="chat-room-message-header">
+                    <span class="chat-room-message-user" [ngStyle]="{'color': message.user.color}">
+                        {{ message.user.name }}
+                    </span>
+                    <span class="chat-room-message-time">{{ message.time | date:'shortTime' }}</span>
+                </div>
+                <div class="chat-room-message-content">{{ message.text }}</div>
             </div>
-            <div class="chat-room-message-content">{{ message.text }}</div>
-        </div>
+        }
     </div>
     <div class="chat-room-input">
         <input

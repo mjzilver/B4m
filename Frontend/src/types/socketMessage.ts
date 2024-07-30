@@ -4,6 +4,7 @@ export interface SocketResponse {
     messages?: Array<SocketMessage>;
     channels?: Array<SocketChannel>;
     users?: Array<SocketUser>;
+    user?: SocketUser;
 }
 
 export interface SocketUser {
@@ -27,4 +28,6 @@ export interface SocketMessage {
     text: string;
     time: number;
     channel_id: number;
+    user?: SocketUser;
+    channel?: SocketChannel;
 }

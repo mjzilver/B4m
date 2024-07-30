@@ -14,7 +14,7 @@ export class AppComponent implements OnInit {
 	users: User[] = [];
 	connectionReady = false;
 
-	currentUser: User | null = new User(1, "Admin", "Admin", Date.now(), "red");
+	currentUser: User | null = null;
 	selectedChannel: Channel | null = null;
 
 	constructor(private websocketService: WebsocketService) {}
@@ -40,7 +40,12 @@ export class AppComponent implements OnInit {
 
 	login(user: UserLogin): void {
 		if(user.existingUser) {
-			this.currentUser = this.users.find(u => u.name === user.name && u.password === user.password) ?? null;
+			// login as existing user
+			this.websocketService.attemptLogin(user);
+
+			this.websocketService.currentUser$.subscribe((user: User | null) => {
+				this.currentUser = user;
+			});
 		} else {
 			// register as new user
 		}
@@ -52,6 +57,7 @@ export class AppComponent implements OnInit {
 	}
 
 	selectChannel(channel: Channel): void {
+		channel.messages = [];
 		this.selectedChannel = channel;
 		this.websocketService.getMessages(channel);
 

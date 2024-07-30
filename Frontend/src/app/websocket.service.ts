@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { Subject } from 'rxjs';
 import { Message } from '../types/message';
-import { User } from '../types/user';
+import { User, UserLogin } from '../types/user';
 import { Channel } from '../types/channel';
 import {
 	SocketChannel,
@@ -19,11 +19,13 @@ export class WebsocketService {
 	private channelSubject = new Subject<Channel[]>();
 	private userSubject = new Subject<User[]>();
 	private connectionStatusSubject = new Subject<boolean>();
+	private currentUserSubject = new Subject<User | null>();
 
 	messages$ = this.messageSubject.asObservable();
 	channels$ = this.channelSubject.asObservable();
 	users$ = this.userSubject.asObservable();
 	connectionStatus$ = this.connectionStatusSubject.asObservable();
+	currentUser$ = this.currentUserSubject.asObservable();
 
 	channels: Channel[] = [];
 	users: User[] = [];
@@ -54,6 +56,9 @@ export class WebsocketService {
 			case 'users':
 				this.users = this.parseUsers(parsed.users!);
 				this.userSubject.next(this.users);
+				break;
+			case 'login':
+				this.loginResponse(parsed.user);
 				break;
 			default:
 				console.warn(`Unknown command: ${parsed.command}`);
@@ -92,10 +97,13 @@ export class WebsocketService {
 	}
 
 	private parseMessage(data: SocketMessage): Message {
-		const user = this.users.find((u) => u.id === data.user_id);
-		const channel = this.channels.find((c) => c.id === data.channel_id);
+		const user = this.users.find((u) => u.id === data.user!.id);
+		const channel = this.channels.find((c) => c.id === data.channel!.id);
 
-		return new Message(user!, data.text, data.time, channel!);
+		if (!user || !channel) {
+			throw new Error('User or Channel not found for message');
+		}
+		return new Message(user, data.text, data.time, channel);
 	}
 
 	private parseChannels(data: SocketChannel[]): Channel[] {
@@ -116,9 +124,8 @@ export class WebsocketService {
 			command: 'broadcast',
 			message: message,
 		};
-		if (this.ws.readyState === WebSocket.OPEN) {
-			this.ws.send(JSON.stringify(messageObject));
-		}
+
+		this.sendObject(messageObject);
 	}
 
 	public getChannels() {
@@ -126,11 +133,7 @@ export class WebsocketService {
 			command: 'getChannels',
 		};
 
-		if (this.ws.readyState === WebSocket.OPEN) {
-			this.ws.send(JSON.stringify(messageObject));
-		} else {
-			console.log('WebSocket not open');
-		}
+		this.sendObject(messageObject);
 	}
 
 	public getUsers() {
@@ -138,11 +141,7 @@ export class WebsocketService {
 			command: 'getUsers',
 		};
 
-		if (this.ws.readyState === WebSocket.OPEN) {
-			this.ws.send(JSON.stringify(messageObject));
-		} else {
-			console.log('WebSocket not open');
-		}
+		this.sendObject(messageObject);
 	}
 
 	joinChannel(channel: Channel) {
@@ -151,11 +150,7 @@ export class WebsocketService {
 			channel: channel,
 		};
 
-		if (this.ws.readyState === WebSocket.OPEN) {
-			this.ws.send(JSON.stringify(messageObject));
-		} else {
-			console.log('WebSocket not open');
-		}
+		this.sendObject(messageObject);
 	}
 
 	getMessages(channel: Channel) {
@@ -164,8 +159,30 @@ export class WebsocketService {
 			channel: channel,
 		};
 
+		this.sendObject(messageObject);
+	}
+
+	attemptLogin(user: UserLogin) {
+		const messageObject = {
+			command: 'loginUser',
+			user: user,
+		};
+
+		this.sendObject(messageObject);
+	}
+
+	loginResponse(user: SocketUser | undefined) {
+		if (user) {
+			console.log('Login successful');
+			const loggedInUser = new User(user.id, user.name, user.joined, user.color);
+
+			this.currentUserSubject.next(loggedInUser);
+		} 
+	}
+
+	sendObject(obj: unknown) {
 		if (this.ws.readyState === WebSocket.OPEN) {
-			this.ws.send(JSON.stringify(messageObject));
+			this.ws.send(JSON.stringify(obj));
 		} else {
 			console.log('WebSocket not open');
 		}

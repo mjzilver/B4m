@@ -1,8 +1,8 @@
 <div class="user-list">
 <p>Current users:</p>
   <ul>
-    <li *ngFor="let user of users">
-      {{ user.name }}
-    </li>
+    @for (user of users; track user.id) {
+      <li>{{ user.name }}</li>
+    } 
   </ul>
 </div>

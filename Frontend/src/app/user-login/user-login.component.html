@@ -2,22 +2,10 @@
   <div class="auth-form">
     <form (submit)="onLogin()">
       <label for="name">Name:</label>
-      <input
-        type="text"
-        id="name"
-        [(ngModel)]="newUser.name"
-        name="name"
-        required
-      />
+      <input type="text" id="name" [(ngModel)]="newUser.name" name="name" required />
 
       <label for="password">Password:</label>
-      <input
-        type="password"
-        id="password"
-        [(ngModel)]="newUser.password"
-        name="password"
-        required
-      />
+      <input type="password" id="password" [(ngModel)]="newUser.password" name="password" required />
 
       <button class="button button-submit" type="submit">Submit</button>
       <button class="button button-register" (click)="onRegister()">

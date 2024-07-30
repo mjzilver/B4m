@@ -25,6 +25,12 @@ server.on("connection", (socket) => {
 			case "getUsers":
 				getUsers(socket);
 				break;
+			case "loginUser":
+				login(parsedMessage.user, socket);
+				break;
+			case "registerUser":
+				register(parsedMessage.user, socket);
+				break;
 			default:
 				console.log(`Unknown command: ${parsedMessage.command}`);
 			}
@@ -51,7 +57,7 @@ function broadcastMessage(message) {
 
 	// Save the message to the database
 	db.run(
-		`INSERT INTO message (user_id, channel_id, message, time) VALUES (?, ?, ?, ?)`,
+		`INSERT INTO message (user_id, channel_id, text, time) VALUES (?, ?, ?, ?)`,
 		[message.user.id, message.channel.id, message.text, message.time],
 		(err) => {
 			if (err) {
@@ -63,7 +69,7 @@ function broadcastMessage(message) {
 
 // Get messages from the database and send them to the requesting client
 function getMessages(channelId, socket) {
-	db.all("SELECT * FROM message WHERE channel_id = ? ORDER BY time DESC LIMIT 100", [channelId], (err, rows) => {
+	db.all("SELECT * FROM message WHERE channel_id = ? ORDER BY time ASC LIMIT 100", [channelId], (err, rows) => {
 		if (err) {
 			console.error(err.message);
 			return;
@@ -109,6 +115,70 @@ function getUsers(socket) {
 	});
 }
 
+function login(user, socket) {
+	db.get("SELECT * FROM user WHERE name = ? AND password = ?", [user.name, user.password], (err, row) => {
+		if (err) {
+			console.error(err.message);
+			return;
+		}
+
+		if (row) {
+			const user = {
+				id: row.id,
+				name: row.name,
+				joined: row.joined,
+				color: row.color
+			} // remove password from user object
+
+			socket.send(JSON.stringify({
+				command: "login",
+				user: user
+			}));
+		} else {
+			socket.send(JSON.stringify({
+				command: "login",
+				user: null
+			}));
+		}
+	});
+}
+
+function register(user, socket) {
+	db.run(
+		`INSERT INTO user (name, password, joined, color) VALUES (?, ?, ?, ?)`,
+		[user.name, user.password, user.joined, user.color],
+		(err) => {
+			if (err) {
+				console.error(err.message);
+				socket.send(JSON.stringify({
+					command: "register",
+					user: null
+				}));
+				return;
+			}
+
+			db.get("SELECT * FROM user WHERE name = ?", [user.name], (err, row) => {
+				if (err) {
+					console.error(err.message);
+					return;
+				}
+
+				const user = {
+					id: row.id,
+					name: row.name,
+					joined: row.joined,
+					color: row.color
+				} // remove password from user object
+
+				socket.send(JSON.stringify({
+					command: "register",
+					user: user
+				}));
+			});
+		}
+	);
+}
+
 // Initialize SQLite database
 let db = new sqlite3.Database("./forum.db", (err) => {
 	if (err) {
@@ -142,7 +212,7 @@ let db = new sqlite3.Database("./forum.db", (err) => {
       id INTEGER PRIMARY KEY AUTOINCREMENT,
       user_id INTEGER NOT NULL,
       channel_id INTEGER NOT NULL,
-      message TEXT NOT NULL,
+      text TEXT NOT NULL,
       time TEXT NOT NULL
     )`
 	);
