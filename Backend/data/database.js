@@ -56,7 +56,8 @@ module.exports = class database {
 	async getAllMessages (channelId) {
 		return new Promise((resolve, reject) => {
 			this.db.all(
-				`SELECT * FROM message
+				`SELECT message.id, user_id, channel_id, text, user.name AS user_name, user.color AS user_color FROM message
+				JOIN user ON message.user_id = user.id
                 WHERE channel_id = ?
                 ORDER BY message.time ASC
                 LIMIT 100`,

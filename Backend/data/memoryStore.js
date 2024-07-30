@@ -12,6 +12,17 @@ module.exports = class MemoryStore {
 		return this.channels.find((channel) => channel.id === id);
 	}
 
+	getChannelByUser(user) {
+		for (const channel of this.channels) {
+			for (const u of channel.users) {
+				if (u.id === user.id) {
+					return channel;
+				}
+			}
+		}
+		return null;
+	}
+
 	addUserToChannel(user, channel) {
 		var foundChannel = this.getChannelById(channel.id)
 		
@@ -30,7 +41,7 @@ module.exports = class MemoryStore {
 
 	removeUserFromChannel(user) {
 		this.channels.forEach((channel) => {
-			let found = channel.users.find((u) => u.id === user.id);
+			let found = channel.users.find((u) => u.id === user?.id);
 			if (found) {
 				channel.users.splice(channel.users.indexOf(found), 1);
 			}
@@ -44,7 +55,7 @@ module.exports = class MemoryStore {
 	storeUser(user, socket) {
 		this.users.push({
 			data: user,
-			socket: socket
+			socketId: socket.id
 		});
 	}
 
@@ -58,6 +69,6 @@ module.exports = class MemoryStore {
 	}
 
 	getCurrentUser(socket) {
-		return this.users.find((user) => user.socket === socket);
+		return this.users.find((user) => user.socketId === socket.id);
 	}
 };

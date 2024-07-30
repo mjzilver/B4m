@@ -33,3 +33,16 @@ export class UserLogin {
 		this.color = 'grey';
 	}
 }
+
+// minimal user object for messages
+export class MessageUser {
+	id: number;
+	name: string;
+	color: string;
+
+	constructor(id: number, name: string, color: string) {
+		this.id = id;
+		this.name = name;
+		this.color = color;
+	}
+}

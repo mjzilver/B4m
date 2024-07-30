@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { Subject, Observable } from 'rxjs';
 import { Message } from '../types/message';
-import { User, UserLogin } from '../types/user';
+import { MessageUser, User, UserLogin } from '../types/user';
 import { Channel } from '../types/channel';
 import { SocketChannel, SocketMessage, SocketResponse, SocketUser } from '../types/socketMessage';
 
@@ -99,7 +99,7 @@ export class WebsocketService {
 	private parseMessages(data: SocketMessage[]): void {
 		data.forEach((item: SocketMessage) => {
 			const channel = this.channels.find(c => c.id === item.channel_id);
-			const user = this.users.find(u => u.id === item.user_id);
+			const user : MessageUser | undefined = item.user ? new MessageUser(item.user.id, item.user.name, item.user.color) : undefined;
 
 			if (user && channel) {
 				const message = new Message(user, item.text, item.time, channel);
@@ -111,8 +111,8 @@ export class WebsocketService {
 	}
 
 	private parseMessage(data: SocketMessage): Message {
-		const user = this.users.find(u => u.id === data.user!.id);
 		const channel = this.channels.find(c => c.id === data.channel!.id);
+		const user = new MessageUser(data.user!.id, data.user!.name, data.user!.color);
 
 		if (!user || !channel) {
 			throw new Error('User or Channel not found for message');

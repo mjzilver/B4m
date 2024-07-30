@@ -16,9 +16,14 @@ class WebSocketServer {
 
 	setupWebSocket() {
 		this.server.on("connection", (socket) => {
+			socket.id = this.generateId();
 			socket.on("message", (message) => this.handleMessage(message, socket));
 			socket.on("close", () => this.handleClose(socket));
 		});
+	}
+
+	generateId() {
+		return 'id' + (new Date()).getTime() + Math.random().toString(36).slice(2);
 	}
 
 	handleMessage(message, socket) {
@@ -63,26 +68,47 @@ class WebSocketServer {
 	}
 
 	handleClose(socket) {
-		console.log("Client disconnected");
-		const currentUser = this.memoryStore.getCurrentUser(socket);
-		if (currentUser) {
-			currentUser.channel = null;
-			this.logout(currentUser.user, currentUser.channel);
+		const found = this.memoryStore.getCurrentUser(socket);
+
+		if (found) {
+			const user = found.data;
+			const channel = this.memoryStore.getChannelByUser(user);
+
+			this.logout(user, channel);
+		} else {
+			console.warn("User not found");
 		}
 	}
 
 	broadcastMessage(message) {
 		this.server.clients.forEach((client) => {
 			if (client.readyState === WebSocket.OPEN) {
+
+				// turn user object into minimal object
+				message.user = {
+					id: message.user.id,
+					name: message.user.name,
+					color: message.user.color
+				};
+
 				client.send(JSON.stringify({ command: "broadcast", message }));
 			}
 		});
 
 		this.database.insertMessage(message);
 	}
+	
 
 	getMessages(channelId, socket) {
 		this.database.getAllMessages(channelId).then((messages) => {
+			for(const m of messages) {
+				m.user = {
+					id: m.user_id,
+					name: m.user_name,
+					color: m.user_color
+				}
+			}
+
 			socket.send(JSON.stringify({
 				command: "messages",
 				channelId,
@@ -94,9 +120,9 @@ class WebSocketServer {
 	getChannels(socket) {
 		this.database.getAllChannels().then((channels) => {
 			// Add in-memory users to channels
-			channels.forEach((channel) => {
-				channel.users = this.memoryStore.getChannelUsers(channel);
-			});
+			for (const c of channels) {
+				c.users = this.memoryStore.getChannelUsers(c);
+			}
 
 			socket.send(JSON.stringify({
 				command: "channels",
@@ -118,6 +144,10 @@ class WebSocketServer {
 
 	leaveChannel(channel, user) {
 		this.memoryStore.removeUserFromChannel(user);
+		if (!channel) {
+			console.warn("Channel not found");
+			return;
+		}
 		channel.users = this.memoryStore.getChannelUsers(channel);
 
 		this.server.clients.forEach((client) => {

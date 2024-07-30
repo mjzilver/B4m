@@ -1,14 +1,14 @@
 import { Channel } from './channel';
-import { User } from './user';
+import { MessageUser, User } from './user';
 
 export class Message {
-	user: User;
+	user: User|MessageUser;
 	text: string;
 	time: number;
 	channel: Channel;
 
 	constructor(
-		user: User,
+		user: User|MessageUser,
 		text: string,
 		time: number = Date.now(),
 		channel: Channel

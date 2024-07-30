@@ -11,7 +11,6 @@ import { WebsocketService } from './websocket.service';
 export class AppComponent implements OnInit, OnDestroy {
 	title = 'frontend';
 	channels: Channel[] = [];
-	users: User[] = [];
 	connectionReady = false;
 
 	currentUser: User | null = null;
@@ -35,24 +34,11 @@ export class AppComponent implements OnInit, OnDestroy {
 
 			if (this.connectionReady) {
 				this.websocketService.getChannels(); 
-				this.websocketService.getUsers();
 			}
 		});
 
 		this.websocketService.channels$.subscribe((channels: Channel[]) => {
-			this.channels = channels; 
-
-			// update user list	
-			channels.forEach(channel => {
-				if(channel.id === this.selectedChannel?.id) {
-					// add users from channel to userlist
-					this.users = channel.users;
-				}
-			});
-		});
-
-		this.websocketService.users$.subscribe((users: User[]) => {
-			this.users = users;
+			this.channels = channels; ;
 		});
 
 		this.websocketService.currentError$.subscribe((error: string | null) => {
@@ -73,6 +59,7 @@ export class AppComponent implements OnInit, OnDestroy {
 	}
 
 	logout(): void {
+		this.websocketService.leaveChannel(this.selectedChannel!, this.currentUser!);
 		this.websocketService.logout(this.currentUser!, this.selectedChannel);
 
 		this.currentUser = null;
