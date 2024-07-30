@@ -39,16 +39,17 @@ export class AppComponent implements OnInit {
 	}
 
 	login(user: UserLogin): void {
-		if(user.existingUser) {
-			// login as existing user
-			this.websocketService.attemptLogin(user);
+		console.log('Logging in', user);
 
-			this.websocketService.currentUser$.subscribe((user: User | null) => {
-				this.currentUser = user;
-			});
+		if(user.existingUser) {
+			this.websocketService.attemptLogin(user);
 		} else {
-			// register as new user
+			this.websocketService.registerUser(user);
 		}
+
+		this.websocketService.currentUser$.subscribe((user: User | null) => {
+			this.currentUser = user;
+		});
 	}
 
 	logout(): void {

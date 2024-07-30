@@ -137,13 +137,42 @@ function login(user, socket) {
 		} else {
 			socket.send(JSON.stringify({
 				command: "login",
-				user: null
+				user: null,
+				error: "Invalid username or password"
 			}));
 		}
 	});
 }
 
 function register(user, socket) {
+	if (!user.name || !user.password) {
+		socket.send(JSON.stringify({
+			command: "register",
+			user: null,
+			error: "Invalid username or password"
+		}));
+		return;
+	}
+	// Check if the user already exists
+	db.get("SELECT * FROM user WHERE name = ?", [user.name], (err, row) => {
+		if (err) {
+			console.error(err.message);
+			return;
+		}
+
+		if (row) {
+			socket.send(JSON.stringify({
+				command: "register",
+				user: null,
+				error: "User already exists"
+			}));
+		} else {
+			createUser(user, socket);
+		}
+	});
+}
+
+function createUser(user, socket) {
 	db.run(
 		`INSERT INTO user (name, password, joined, color) VALUES (?, ?, ?, ?)`,
 		[user.name, user.password, user.joined, user.color],
@@ -152,7 +181,8 @@ function register(user, socket) {
 				console.error(err.message);
 				socket.send(JSON.stringify({
 					command: "register",
-					user: null
+					user: null,
+					erorr: "Failed to create user"
 				}));
 				return;
 			}

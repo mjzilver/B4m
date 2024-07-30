@@ -42,6 +42,11 @@ export class WebsocketService {
 
 			console.log(`Received message: ${JSON.stringify(parsed)}`);
 
+			if(parsed.error) {
+				console.error(parsed.error);
+				return;
+			}
+
 			switch (parsed.command) {
 			case 'broadcast':
 				this.messageSubject.next(this.parseMessage(parsed.message!));
@@ -59,6 +64,9 @@ export class WebsocketService {
 				break;
 			case 'login':
 				this.loginResponse(parsed.user);
+				break;
+			case 'register':
+				this.loginResponse(parsed.user, true);
 				break;
 			default:
 				console.warn(`Unknown command: ${parsed.command}`);
@@ -171,13 +179,27 @@ export class WebsocketService {
 		this.sendObject(messageObject);
 	}
 
-	loginResponse(user: SocketUser | undefined) {
-		if (user) {
+	loginResponse(user: SocketUser | undefined, newUser = false) {
+		if (newUser) {
+			console.log('Registration successful');
+			const registeredUser = new User(user!.id, user!.name, user!.joined, user!.color);
+
+			this.currentUserSubject.next(registeredUser);
+		} else if (user) {
 			console.log('Login successful');
 			const loggedInUser = new User(user.id, user.name, user.joined, user.color);
 
 			this.currentUserSubject.next(loggedInUser);
 		} 
+	}
+
+	registerUser(user: UserLogin) {
+		const messageObject = {
+			command: 'registerUser',
+			user: user,
+		};
+
+		this.sendObject(messageObject);
 	}
 
 	sendObject(obj: unknown) {

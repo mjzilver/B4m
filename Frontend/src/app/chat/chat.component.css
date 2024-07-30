@@ -68,9 +68,10 @@
 }
 
 .chat-room-input-button {
+    color: white;
     padding: 10px 20px;
     background-color: #555555;
-    border: none;
+    border: white solid 1px;
     cursor: pointer;
     border-radius: 0 4px 4px 0;
     transition: background-color 0.3s ease;
