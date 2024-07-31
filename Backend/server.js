@@ -81,8 +81,6 @@ class WebSocketServer {
 			const channel = this.memoryStore.getChannelByUser(user);
 
 			this.logout(user, channel);
-		} else {
-			console.warn("User not found");
 		}
 	}
 

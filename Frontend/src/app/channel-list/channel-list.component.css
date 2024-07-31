@@ -1,12 +1,3 @@
-
-.channels-card {
-    background-color: #3b3b3b;
-    width: 15vw;
-    height: 100%;
-    padding: 20px;
-    box-shadow: 2px 0 5px rgba(0,0,0,0.5);
-}
-
 .channels-card-title {
     font-size: 24px;
     margin-bottom: 20px;

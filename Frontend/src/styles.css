@@ -9,6 +9,61 @@ body {
 .app-container {
     display: flex;
     height: 100vh;
+    width: 100vw;
+    overflow: hidden;
+}
+
+.app-sidebar {
+    background-color: #3b3b3b;
+    width: 15vw;
+    padding: 20px;
+    box-shadow: 2px 0 5px rgba(0,0,0,0.5);
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+}
+
+.app-content {
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+}
+
+.app-header {
+    background-color: #3b3b3b;
+    padding: 20px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.5);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.app-header-left {
+    display: flex;
+    align-items: center;
+}
+
+.app-header-right {
+    display: flex;
+    align-items: center;
+    flex-direction: column;
+}   
+
+.app-header-right-top {
+    display: flex;
+    align-items: center;
+}
+
+.app-header-right-bottom {
+    display: flex;
+    align-items: center;
+}
+
+.app-chat-container {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
     overflow: hidden;
 }
 
@@ -29,24 +84,6 @@ body {
 
 .button:hover {
     background-color: #777777;
-}
-
-.button-logout {
-    position: absolute;
-    top: 20px;
-    right: 20px;
-}
-
-.user-chat-container {
-    flex-grow: 1;
-    display: flex;
-    flex-direction: column;
-}
-
-.user-list {
-    background-color: #3b3b3b;
-    padding: 20px;
-    box-shadow: 0 2px 5px rgba(0,0,0,0.5);
 }
 
 .user-list h2 {

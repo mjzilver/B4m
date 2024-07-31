@@ -1,12 +1,3 @@
-.user-list {
-    padding: 10px;
-    background-color: #3b3b3b;
-    border-radius: 5px;
-    margin-bottom: 20px; 
-    height: 10vh;
-    min-height: 60px;
-}
-
 .user-list p {
     font-weight: bold;
     margin: 0;
@@ -26,5 +17,5 @@
     background-color: #464040; 
     padding: 5px 10px;
     border-radius: 3px;
-    border: 1px solid #dddddd; /* Border around each item */
+    border: 1px solid #dddddd; 
 }

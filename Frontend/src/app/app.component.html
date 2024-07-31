@@ -1,21 +1,37 @@
+<!-- Modals -->
 <app-error-display [error]="currentError"></app-error-display>
 
 @if (currentUser === null) {
 <app-user-login (login)="login($event)"></app-user-login>
 }
 @if (currentUser !== null) {
-<app-user-logout [currentUser]="currentUser" (logout)="logout()"> </app-user-logout>
-
 <div class="app-container">
-  <app-channel-list [channels]="channels" [selectedChannel]="selectedChannel" (selectChannel)="selectChannel($event)"></app-channel-list>
-  <div class="user-chat-container">
-
-    @if (selectedChannel) {
-    <app-user-list [users]="selectedChannel.users"></app-user-list>
-    <app-chat [channel]="selectedChannel" [user]="currentUser"></app-chat>
-    } @else {
-    <app-user-list [users]="[]"></app-user-list>
-    }
+  <div class="app-sidebar">
+    <app-channel-list [channels]="channels" [selectedChannel]="selectedChannel"
+      (selectChannel)="selectChannel($event)"></app-channel-list>
+  </div>
+  <div class="app-content">
+    <div class="app-header">
+      <div class="app-header-left">
+        @if (selectedChannel) {
+        <app-user-list [users]="selectedChannel.users"></app-user-list>
+        }
+      </div>
+      <div class="app-header-right">
+        <div class="app-header-right-top">
+          <div> Current user: {{currentUser.name}}</div>
+        </div>
+        <div class="app-header-right-bottom">
+          <app-user-profile [user]="currentUser"></app-user-profile>
+          <app-user-logout [currentUser]="currentUser" (logout)="logout()"> </app-user-logout>
+        </div>  
+      </div>
+    </div>
+    <div class="app-chat-container">
+      @if (selectedChannel) {
+      <app-chat [channel]="selectedChannel" [user]="currentUser"></app-chat>
+      }
+    </div>
   </div>
 </div>
 }
