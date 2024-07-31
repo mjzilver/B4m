@@ -25,10 +25,10 @@ export class UserLogin {
 	joined: number;
 	color: string;
 
-	constructor(name: string, password: string) {
+	constructor(name: string, password: string, existingUser: boolean = true) {
 		this.name = name;
 		this.password = password;
-		this.existingUser = true;
+		this.existingUser = existingUser;
 		this.joined = Date.now();
 		this.color = 'grey';
 	}
