@@ -17,7 +17,7 @@ module.exports = class Validator {
 	validateUser(user) {
 		console.log(user);
 
-		if (!user || !user.name || !user.password || !user.color)
+		if (!user || !user.name || !user.color)
 			return [false, "Invalid user object"];
 
 		// Check if the username is empty or too long
@@ -25,7 +25,7 @@ module.exports = class Validator {
 			return [false, "Invalid username"];
 
 		// Check if the password is empty or too long
-		if (user.password.length < 1 || user.password.length > 200)
+		if (user.password && (user.password.length < 1 || user.password.length > 200))
 			return [false, "Invalid password"];
 
 		// Check if the color is in the allowed colors

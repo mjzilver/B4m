@@ -45,6 +45,8 @@ export class AppComponent implements OnInit, OnDestroy {
 
 			if (this.connectionReady) {
 				this.websocketService.getChannels(); 
+			} else {
+				this.currentError = 'Connection to server lost, please refresh the page';
 			}
 		});
 

@@ -54,6 +54,7 @@ export class WebsocketService {
 		case 'users':
 			this.userService.parseUsers(parsed.users!);
 			break;
+		case 'userChanged':
 		case 'login':
 		case 'register':
 			this.userService.handleLogin(parsed.user!);
@@ -80,6 +81,10 @@ export class WebsocketService {
 
 	getUsers(): void {
 		this.wsConnectionService.sendMessage({ command: 'getUsers' });
+	}
+
+	updateUser(user: User): void {
+		this.wsConnectionService.sendMessage({ command: 'updateUser', user });
 	}
 
 	joinChannel(channel: Channel, user: User): void {

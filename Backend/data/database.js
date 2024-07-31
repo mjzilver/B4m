@@ -162,4 +162,27 @@ module.exports = class database {
 		});
 	}
 
+	async updateUser(user) {
+		return new Promise((resolve, reject) => {
+			this.db.run(
+				`UPDATE user SET color = ? WHERE id = ?`,
+				[user.color, user.id],
+				(err) => {
+					if (err) {
+						console.error(err.message);
+						reject(err);
+					}
+
+					this.db.get("SELECT id, name, joined, color FROM user WHERE id = ?", [user.id], (err, row) => {
+						if (err) {
+							console.error(err.message);
+							reject(err);
+						}
+
+						resolve(row);
+					});
+				}
+			);
+		});
+	}
 }

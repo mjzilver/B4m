@@ -61,6 +61,9 @@ class WebSocketServer {
 			case "registerUser":
 				this.register(parsedMessage.user, socket);
 				break;
+			case "updateUser":
+				this.updateUser(parsedMessage.user, socket);
+				break
 			default:
 				console.log(`Unknown command: ${parsedMessage.command}`);
 			}
@@ -215,6 +218,46 @@ class WebSocketServer {
 				this.sendError(socket, "User already exists");
 			} else {
 				this.createUser(user, socket);
+			}
+		});
+	}
+
+	updateUser(user, socket) {
+		let found = this.memoryStore.getCurrentUser(socket);
+
+		if (!found) {
+			this.sendError(socket, "User not found");
+			return;
+		}
+
+		// check if user is updating their own data
+		if (found.data.id !== user.id) {
+			this.sendError(socket, "Invalid user data");
+			return;
+		}
+
+		// you can only change your color not your name/password
+		if (found.data.name !== user.name || found.data.password !== user.password) {
+			this.sendError(socket, "Invalid change");
+			return;
+		}
+
+		const [valid, error] = this.validator.validateUser(user);
+
+		if (!valid) {
+			this.sendError(socket, error);
+			return;
+		}
+
+		this.database.updateUser(user).then((row) => {
+			if (row) {
+				socket.send(JSON.stringify({
+					command: "update",
+					user: row
+				}));
+				this.memoryStore.storeUser(row, socket);
+			} else {
+				this.sendError(socket, "Failed to update user");
 			}
 		});
 	}

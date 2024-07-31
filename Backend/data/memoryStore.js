@@ -54,10 +54,18 @@ module.exports = class MemoryStore {
 	}
 
 	storeUser(user, socket) {
-		this.users.push({
-			data: user,
-			socketId: socket.id
-		});
+		var foundUser = this.getUserById(user.id);
+
+		if (foundUser) {
+			foundUser.socketId = socket.id;
+			foundUser.data = user;
+			return;
+		} else {
+			this.users.push({
+				data: user,
+				socketId: socket.id
+			});
+		}
 	}
 
 	removeUser(user) {

@@ -1,5 +1,7 @@
 import { Component, Input, OnInit } from '@angular/core';
 import { User } from '../../types/user';
+import { UserService } from '../websocket-service/user.service';
+import { WebsocketService } from '../websocket-service/websocket.service';
 
 @Component({
 	selector: 'app-user-profile',
@@ -7,34 +9,42 @@ import { User } from '../../types/user';
 	styleUrl: './user-profile.component.css'
 })
 export class UserProfileComponent implements OnInit {
-  @Input() user!: User | null;
-  
-  showModal: boolean = false;
+	@Input() user!: User | null;
 
-  allowedColors: string[] =  [
-  	"red", 
-  	"green", 
-  	"blue", 
-  	"yellow", 
-  	"purple", 
-  	"orange", 
-  	"pink", 
-  	"brown", 
-  	"white"
-  ];
+	showModal: boolean = false;
 
-  constructor() { }
+	allowedColors: string[] =  [
+		"red", 
+		"green", 
+		"blue", 
+		"yellow", 
+		"purple", 
+		"orange", 
+		"pink", 
+		"brown", 
+		"white",
+		"grey"
+	];
 
-  ngOnInit(): void { }
+	constructor(
+		private userService: UserService,
+		private WebSocketService: WebsocketService
+	) { }
 
-  onSubmit() {
-  	throw new Error('Method not implemented.');
-  }
-  openModal() {
-  	throw new Error('Method not implemented.');
-  }
-  closeModal() {
-  	throw new Error('Method not implemented.');
-  }
+	ngOnInit(): void { }
 
+	onSubmit() {
+		if(this.user) {
+			this.WebSocketService.updateUser(this.user);
+		}
+		this.closeModal();
+	}
+
+	openModal() {
+		this.showModal = true;
+	}
+
+	closeModal() {
+		this.showModal = false;
+	}
 }
