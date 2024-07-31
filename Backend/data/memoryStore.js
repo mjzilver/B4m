@@ -1,5 +1,6 @@
 module.exports = class MemoryStore {
 	constructor() {
+		// user format: {data: user, socketId: socket.id, lastMessageTime: message.time}
 		this.users = [];
 		this.channels = [];
 	}
@@ -70,5 +71,26 @@ module.exports = class MemoryStore {
 
 	getCurrentUser(socket) {
 		return this.users.find((user) => user.socketId === socket.id);
+	}
+
+	checkMessageTimeout(message, socket) {
+		const user = this.getCurrentUser(socket);
+		if(!user) {
+			return [false, "User not found"];
+		}
+
+		// first message
+		if(user.lastMessageTime === undefined) {
+			user.lastMessageTime = message.time;
+			return [true, null];
+		}
+
+		// cant send messages too fast (1 message per 2 seconds)
+		if (message.time - user.lastMessageTime < 2000) {
+			const secondsRoundedUp = Math.ceil((2000 - (message.time - user.lastMessageTime)) / 1000);
+			return [false , `Sending messages too fast, wait ${secondsRoundedUp} seconds`];
+		}
+		user.lastMessageTime = message.time;
+		return [true, null];
 	}
 };

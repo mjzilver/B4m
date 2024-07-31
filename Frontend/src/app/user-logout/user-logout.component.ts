@@ -7,10 +7,10 @@ import { User } from '../../types/user';
 	styleUrl: './user-logout.component.css'
 })
 export class UserLogoutComponent {
-  @Input() currentUser!: User | null; 
-  @Output() logout: EventEmitter<void> = new EventEmitter<void>();
+    @Input() currentUser!: User | null; 
+    @Output() logout: EventEmitter<void> = new EventEmitter<void>();
 
-  onLogout(): void {
-  	this.logout.emit(); 
-  }
+    onLogout(): void {
+    	this.logout.emit(); 
+    }
 }

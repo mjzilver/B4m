@@ -1,12 +1,14 @@
 const WebSocket = require("ws");
 const MemoryStore = require("./data/memoryStore");
 const Database = require("./data/database");
+const Validator = require("./data/validator");
 
 class WebSocketServer {
 	constructor(port) {
 		this.port = port;
 		this.memoryStore = new MemoryStore();
 		this.database = new Database();
+		this.validator = new Validator();
 
 		this.server = new WebSocket.Server({ port: this.port }, () => {
 			console.log(`WebSocket server is running on ws://localhost:${this.port}`);
@@ -29,11 +31,11 @@ class WebSocketServer {
 	handleMessage(message, socket) {
 		try {
 			const parsedMessage = JSON.parse(message);
-			console.log(`Parsed message:`, parsedMessage);
+			//console.log(`Parsed message:`, parsedMessage);
 
 			switch (parsedMessage.command) {
 			case "broadcast":
-				this.broadcastMessage(parsedMessage.message);
+				this.broadcastMessage(parsedMessage.message, socket);
 				break;
 			case "getMessages":
 				this.getMessages(parsedMessage.channel.id, socket);
@@ -67,6 +69,10 @@ class WebSocketServer {
 		}
 	}
 
+	sendError(socket, error) {
+		socket.send(JSON.stringify({ command: "error", error }));
+	}
+
 	handleClose(socket) {
 		const found = this.memoryStore.getCurrentUser(socket);
 
@@ -80,7 +86,21 @@ class WebSocketServer {
 		}
 	}
 
-	broadcastMessage(message) {
+	broadcastMessage(message, socket) {
+		const [valid, error] = this.validator.validateMessage(message);
+
+		if(!valid) {
+			this.sendError(socket, error);
+			return;
+		}
+
+		const [canPost, timeoutError] = this.memoryStore.checkMessageTimeout(message, socket);
+
+		if (!canPost) {
+			this.sendError(socket, timeoutError);
+			return;
+		}
+
 		this.server.clients.forEach((client) => {
 			if (client.readyState === WebSocket.OPEN) {
 
@@ -97,7 +117,6 @@ class WebSocketServer {
 
 		this.database.insertMessage(message);
 	}
-	
 
 	getMessages(channelId, socket) {
 		this.database.getAllMessages(channelId).then((messages) => {
@@ -180,32 +199,22 @@ class WebSocketServer {
 				}));
 				this.memoryStore.storeUser(row, socket);
 			} else {
-				socket.send(JSON.stringify({
-					command: "login",
-					user: null,
-					error: "Invalid username or password"
-				}));
+				this.sendError(socket, "Invalid login");
 			}
 		});
 	}
 
 	register(user, socket) {
-		if (!user.name || !user.password) {
-			socket.send(JSON.stringify({
-				command: "register",
-				user: null,
-				error: "Invalid username or password"
-			}));
+		const [valid, error] = this.validator.validateUser(user);
+
+		if (!valid) {
+			this.sendError(socket, error);
 			return;
 		}
 		
 		this.database.checkIfUserExists(user.name).then((row) => {
 			if (row) {
-				socket.send(JSON.stringify({
-					command: "register",
-					user: null,
-					error: "User already exists"
-				}));
+				this.sendError(socket, "User already exists");
 			} else {
 				this.createUser(user, socket);
 			}
@@ -221,11 +230,7 @@ class WebSocketServer {
 				}));
 				this.memoryStore.storeUser(row, socket);
 			} else {
-				socket.send(JSON.stringify({
-					command: "register",
-					user: null,
-					error: "Failed to create user"
-				}));
+				this.sendError(socket, "Failed to create user");
 			}
 		});
 	}

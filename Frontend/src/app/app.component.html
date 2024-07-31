@@ -1,11 +1,4 @@
-@if (currentError !== null) {
-<div class="error-container">
-  <div class="error-card">
-    <h2 class="error-card-title">Error</h2>
-    <p class="error-card-message">{{ currentError }}</p>
-  </div>
-</div>
-}
+<app-error-display [error]="currentError"></app-error-display>
 
 @if (currentUser === null) {
 <app-user-login (login)="login($event)"></app-user-login>

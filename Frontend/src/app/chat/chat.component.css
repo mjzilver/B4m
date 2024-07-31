@@ -5,6 +5,7 @@
     height: 83vh; 
     box-sizing: border-box;
     overflow: hidden;
+    width: 80vw;
 }
 
 .chat-room-title {

@@ -6,7 +6,7 @@ export interface SocketResponse {
     channel?: SocketChannel;
     users?: Array<SocketUser>;
     user?: SocketUser;
-    error?: string;
+    error?: string | undefined;
 }
 
 export interface SocketUser {

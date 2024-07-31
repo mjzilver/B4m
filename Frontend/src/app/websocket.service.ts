@@ -76,6 +76,10 @@ export class WebsocketService {
 		case 'register':
 			this.handleLogin(parsed.user!);
 			break;
+		case 'error':
+			console.error(parsed.error);
+			this.errorSubject.next(parsed.error!);
+			break;
 		default:
 			console.warn(`Unknown command: ${parsed.command}`);
 		}

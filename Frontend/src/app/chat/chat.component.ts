@@ -52,12 +52,14 @@ export class ChatComponent implements OnInit, OnDestroy {
 	}
 
 	sendMessage(): void {
-		if (this.newMessage.trim()) {
+		if (this.newMessage.trim() && this.newMessage.length <= 500) {
 			const message = new Message(this.user, this.newMessage, Date.now(), this.channel);
 
 			this.websocketService.sendMessage(message);
 			this.newMessage = '';
 			this.cd.detectChanges();
+		} else {
+			console.error('Message is empty or too long');
 		}
 	}
 	private scrollToBottom(): void {

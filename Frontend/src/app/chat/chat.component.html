@@ -19,6 +19,7 @@
             [(ngModel)]="newMessage"
             (keyup.enter)="sendMessage()"
             placeholder="Type a message..."
+            maxlength="500"
         />
         <button class="chat-room-input-button" (click)="sendMessage()">Send</button>
     </div>

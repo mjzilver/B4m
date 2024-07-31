@@ -11,6 +11,7 @@ import { UserListComponent } from './user-list/user-list.component';
 import { UserLoginComponent } from './user-login/user-login.component';
 import { UserLogoutComponent } from './user-logout/user-logout.component';
 import { ChannelListComponent } from './channel-list/channel-list.component';
+import { ErrorDisplayComponent } from './error-display/error-display.component';
 
 const routes: Routes = [
 	{ path: '', component: AppComponent },
@@ -23,7 +24,8 @@ const routes: Routes = [
 		UserListComponent,
 		UserLoginComponent,
 		UserLogoutComponent,
-		ChannelListComponent
+		ChannelListComponent,
+		ErrorDisplayComponent
 	],
 	imports: [
 		BrowserModule,
