@@ -1,6 +1,5 @@
 import { Component, Input, OnInit } from '@angular/core';
 import { User } from '../../types/user';
-import { UserService } from '../websocket-service/user.service';
 import { WebsocketService } from '../websocket-service/websocket.service';
 
 @Component({
@@ -27,7 +26,6 @@ export class UserProfileComponent implements OnInit {
 	];
 
 	constructor(
-		private userService: UserService,
 		private WebSocketService: WebsocketService
 	) { }
 

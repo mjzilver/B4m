@@ -4,7 +4,7 @@ import { Subject } from 'rxjs';
 @Injectable({
 	providedIn: 'root',
 })
-export class WebSocketConnectionService {
+export class ConnectionService {
 	private ws!: WebSocket;
 	private connectionStatusSubject = new Subject<boolean>();
 

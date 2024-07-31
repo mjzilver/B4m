@@ -13,10 +13,11 @@ import { UserLogoutComponent } from './user-logout/user-logout.component';
 import { ChannelListComponent } from './channel-list/channel-list.component';
 import { ErrorDisplayComponent } from './error-display/error-display.component';
 import { UserProfileComponent } from './user-profile/user-profile.component';
-import { WebSocketConnectionService } from './websocket-service/connection.service';
+import { ConnectionService } from './websocket-service/connection.service';
 import { UserService } from './websocket-service/user.service';
 import { ChannelService } from './websocket-service/channel.service';
 import { MessageService } from './websocket-service/message.service';
+import { AuthService } from './services/auth.service';
 
 const routes: Routes = [
 	{ path: '', component: AppComponent },
@@ -44,7 +45,8 @@ const routes: Routes = [
 		UserService,
 		ChannelService,
 		MessageService,
-		WebSocketConnectionService
+		ConnectionService,
+		AuthService
 	],
 	bootstrap: [AppComponent]
 })

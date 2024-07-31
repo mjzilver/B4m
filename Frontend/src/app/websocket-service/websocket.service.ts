@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { WebSocketConnectionService } from './connection.service';
+import { ConnectionService } from './connection.service';
 import { MessageService } from './message.service';
 import { ChannelService } from './channel.service';
 import { UserService } from './user.service';
@@ -14,7 +14,7 @@ import { User, UserLogin } from '../../types/user';
 })
 export class WebsocketService {
 	constructor(
-        private wsConnectionService: WebSocketConnectionService,
+        private wsConnectionService: ConnectionService,
         private messageService: MessageService,
         private channelService: ChannelService,
         private userService: UserService,
@@ -27,7 +27,7 @@ export class WebsocketService {
 	private handleMessage(event: MessageEvent): void {
 		const parsed: SocketResponse = JSON.parse(event.data);
 
-		console.log(`Received message: ${JSON.stringify(parsed)}`);
+		//console.log(`Received message: ${JSON.stringify(parsed)}`);
 
 		if (parsed.error) {
 			console.error(parsed.error);

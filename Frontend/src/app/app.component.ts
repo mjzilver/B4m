@@ -1,11 +1,12 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { Channel } from '../types/channel';
-import { User, UserLogin } from '../types/user';
+import { User } from '../types/user';
 import { WebsocketService } from './websocket-service/websocket.service'
 import { ErrorService } from './websocket-service/error.service';
-import { WebSocketConnectionService as ConnectionService } from './websocket-service/connection.service';
+import { ConnectionService } from './websocket-service/connection.service';
 import { ChannelService } from './websocket-service/channel.service';
 import { UserService } from './websocket-service/user.service';
+import { AuthService } from './services/auth.service';
 
 @Component({
 	selector: 'app-root',
@@ -26,7 +27,8 @@ export class AppComponent implements OnInit, OnDestroy {
 		private errorService: ErrorService,
 		private connectionService: ConnectionService,
 		private channelService: ChannelService,
-		private userService: UserService
+		private userService: UserService,
+		private authService: AuthService
 	) {}
 
 	ngOnDestroy(): void {
@@ -35,7 +37,7 @@ export class AppComponent implements OnInit, OnDestroy {
 		}
 
 		if (this.currentUser) {
-			this.logout();
+			this.authService.logout(this.selectedChannel);
 		}
 	}
 
@@ -57,26 +59,14 @@ export class AppComponent implements OnInit, OnDestroy {
 		this.errorService.currentError$.subscribe((error: string | null) => {
 			this.currentError = error;
 		});
-	}
-
-	login(user: UserLogin): void {
-		if(user.existingUser) {
-			this.websocketService.attemptLogin(user);
-		} else {
-			this.websocketService.registerUser(user);
-		}
-
+		
 		this.userService.currentUser$.subscribe((user: User | null) => {
 			this.currentUser = user;
 		});
 	}
 
-	logout(): void {
-		this.websocketService.leaveChannel(this.selectedChannel!, this.currentUser!);
-		this.websocketService.logout(this.currentUser!, this.selectedChannel);
-
-		this.currentUser = null;
-		this.selectedChannel = null; 
+	logout() {
+		this.authService.logout(this.selectedChannel);
 	}
 
 	selectChannel(channel: Channel): void {

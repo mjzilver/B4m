@@ -2,7 +2,7 @@
 <app-error-display [error]="currentError"></app-error-display>
 
 @if (currentUser === null) {
-<app-user-login (login)="login($event)"></app-user-login>
+<app-user-login></app-user-login>
 }
 @if (currentUser !== null) {
 <div class="app-container">

@@ -15,8 +15,6 @@ module.exports = class Validator {
 	constructor() { }
 
 	validateUser(user) {
-		console.log(user);
-
 		if (!user || !user.name || !user.color)
 			return [false, "Invalid user object"];
 

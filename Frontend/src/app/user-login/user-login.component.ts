@@ -1,5 +1,6 @@
 import { Component, EventEmitter, Output } from '@angular/core';
 import {  UserLogin } from '../../types/user';
+import { AuthService } from '../services/auth.service';
 
 @Component({
 	selector: 'app-user-login',
@@ -9,14 +10,20 @@ import {  UserLogin } from '../../types/user';
 export class UserLoginComponent {
   @Output() login: EventEmitter<UserLogin> = new EventEmitter<UserLogin>();
   newUser: UserLogin = new UserLogin('', '');
+
+  constructor(
+    private authService: AuthService
+  ) { }
   
   onLogin(): void {
-  	this.login.emit(this.newUser);
+  	this.newUser.existingUser = true;
+
+  	this.authService.login(this.newUser);
   }
 
   onRegister() {
   	this.newUser.existingUser = false;
 
-  	this.login.emit(this.newUser);
+  	this.authService.login(this.newUser);
   }
 }
