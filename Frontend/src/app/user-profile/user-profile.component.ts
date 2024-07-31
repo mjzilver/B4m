@@ -9,6 +9,7 @@ import { WebsocketService } from '../websocket-service/websocket.service';
 })
 export class UserProfileComponent implements OnInit {
 	@Input() user!: User | null;
+	oldColor: string = '';
 
 	showModal: boolean = false;
 
@@ -29,11 +30,17 @@ export class UserProfileComponent implements OnInit {
 		private WebSocketService: WebsocketService
 	) { }
 
-	ngOnInit(): void { }
+	ngOnInit(): void { 
+		if(this.user) {
+			this.oldColor = this.user.color;
+		}
+	}
 
 	onSubmit() {
 		if(this.user) {
-			this.WebSocketService.updateUser(this.user);
+			if(this.user.color !== this.oldColor) {
+				this.WebSocketService.updateUser(this.user);
+			}
 		}
 		this.closeModal();
 	}

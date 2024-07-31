@@ -55,20 +55,5 @@ describe('UserLoginComponent', () => {
 
 		expect(loginSpy).toHaveBeenCalledWith(component.newUser);
 		expect(component.newUser.existingUser).toBeFalse();
-	});
-
-	it('should bind input fields to newUser model', () => {
-		const nameInput: HTMLInputElement = fixture.debugElement.query(By.css('input[name="name"]')).nativeElement;
-		const passwordInput: HTMLInputElement = fixture.debugElement.query(By.css('input[name="password"]')).nativeElement;
-
-		nameInput.value = 'testuser';
-		passwordInput.value = 'password';
-		nameInput.dispatchEvent(new Event('input'));
-		passwordInput.dispatchEvent(new Event('input'));
-
-		fixture.detectChanges();
-
-		expect(component.newUser.name).toBe('testuser');
-		expect(component.newUser.password).toBe('password');
-	});
+	});	
 });

@@ -9,4 +9,5 @@ export class MockWebsocketService {
 	registerUser(user: UserLogin) { }
 	leaveChannel(channel: Channel, user: User) { }
 	logout(user: User, channel: Channel | null) { }
+	updateUser(user: User) {}
 }
