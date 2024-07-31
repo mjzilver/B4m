@@ -6,12 +6,17 @@ import { RouterModule, Routes } from '@angular/router';
 
 import { AppComponent } from './app.component';
 import { ChatComponent } from './chat/chat.component';
-import { WebsocketService } from './websocket.service';
+import { WebsocketService } from './websocket-service/websocket.service';
 import { UserListComponent } from './user-list/user-list.component';
 import { UserLoginComponent } from './user-login/user-login.component';
 import { UserLogoutComponent } from './user-logout/user-logout.component';
 import { ChannelListComponent } from './channel-list/channel-list.component';
 import { ErrorDisplayComponent } from './error-display/error-display.component';
+import { UserProfileComponent } from './user-profile/user-profile.component';
+import { WebSocketConnectionService } from './websocket-service/connection.service';
+import { UserService } from './websocket-service/user.service';
+import { ChannelService } from './websocket-service/channel.service';
+import { MessageService } from './websocket-service/message.service';
 
 const routes: Routes = [
 	{ path: '', component: AppComponent },
@@ -22,6 +27,7 @@ const routes: Routes = [
 		AppComponent,
 		ChatComponent,
 		UserListComponent,
+		UserProfileComponent,
 		UserLoginComponent,
 		UserLogoutComponent,
 		ChannelListComponent,
@@ -33,7 +39,13 @@ const routes: Routes = [
 		ReactiveFormsModule,
 		RouterModule.forRoot(routes) 
 	],
-	providers: [WebsocketService],
+	providers: [
+		WebsocketService,
+		UserService,
+		ChannelService,
+		MessageService,
+		WebSocketConnectionService
+	],
 	bootstrap: [AppComponent]
 })
 export class AppModule { }

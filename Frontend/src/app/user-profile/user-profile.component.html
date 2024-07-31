@@ -1,0 +1,24 @@
+<button (click)="openModal()">Edit Profile</button>
+
+@if (showModal && user) {
+<div class="modal">
+  <div class="modal-content">
+    <span class="close" (click)="closeModal()">&times;</span>
+    <h2>Edit Profile</h2>
+    <form (ngSubmit)="onSubmit()">
+      <label for="username">Username</label>
+      <input type="text" id="username" name="username" [(ngModel)]="user.name" readonly>
+
+      <label for="color">Pick a new color</label>
+      <select id="color" name="color" [(ngModel)]="user.color">
+        <option *ngFor="let color of allowedColors" [value]="color">{{ color }}</option>
+      </select>
+
+      <label for="password">New Password</label>
+      <input type="password" id="password" name="password" [(ngModel)]="user.password" required>
+
+      <button type="submit">Save Changes</button>
+    </form>
+  </div>
+</div>
+}

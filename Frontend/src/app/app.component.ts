@@ -1,7 +1,11 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { Channel } from '../types/channel';
 import { User, UserLogin } from '../types/user';
-import { WebsocketService } from './websocket.service';
+import { WebsocketService } from './websocket-service/websocket.service'
+import { ErrorService } from './websocket-service/error.service';
+import { WebSocketConnectionService as ConnectionService } from './websocket-service/connection.service';
+import { ChannelService } from './websocket-service/channel.service';
+import { UserService } from './websocket-service/user.service';
 
 @Component({
 	selector: 'app-root',
@@ -17,7 +21,14 @@ export class AppComponent implements OnInit, OnDestroy {
 	selectedChannel: Channel | null = null;
 	currentError: string | null = null;
 
-	constructor(private websocketService: WebsocketService) {}
+	constructor(
+		private websocketService: WebsocketService,
+		private errorService: ErrorService,
+		private connectionService: ConnectionService,
+		private channelService: ChannelService,
+		private userService: UserService
+	) {}
+
 	ngOnDestroy(): void {
 		if (this.selectedChannel) {
 			this.websocketService.leaveChannel(this.selectedChannel, this.currentUser!);
@@ -29,7 +40,7 @@ export class AppComponent implements OnInit, OnDestroy {
 	}
 
 	ngOnInit(): void {
-		this.websocketService.connectionStatus$.subscribe(status => {
+		this.connectionService.connectionStatus$.subscribe(status => {
 			this.connectionReady = status;
 
 			if (this.connectionReady) {
@@ -37,11 +48,11 @@ export class AppComponent implements OnInit, OnDestroy {
 			}
 		});
 
-		this.websocketService.channels$.subscribe((channels: Channel[]) => {
+		this.channelService.channels$.subscribe((channels: Channel[]) => {
 			this.channels = channels; ;
 		});
 
-		this.websocketService.currentError$.subscribe((error: string | null) => {
+		this.errorService.currentError$.subscribe((error: string | null) => {
 			this.currentError = error;
 		});
 	}
@@ -53,7 +64,7 @@ export class AppComponent implements OnInit, OnDestroy {
 			this.websocketService.registerUser(user);
 		}
 
-		this.websocketService.currentUser$.subscribe((user: User | null) => {
+		this.userService.currentUser$.subscribe((user: User | null) => {
 			this.currentUser = user;
 		});
 	}

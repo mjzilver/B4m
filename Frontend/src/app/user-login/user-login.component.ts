@@ -9,7 +9,7 @@ import {  UserLogin } from '../../types/user';
 export class UserLoginComponent {
   @Output() login: EventEmitter<UserLogin> = new EventEmitter<UserLogin>();
   newUser: UserLogin = new UserLogin('', '');
-
+  
   onLogin(): void {
   	this.login.emit(this.newUser);
   }
