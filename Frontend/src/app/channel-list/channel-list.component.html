@@ -1,5 +1,9 @@
 <div class="channels-card">
-    <h2 class="channels-card-title">Channels</h2>
+    <h2 class="channels-card-title">
+      <span>Channels </span>
+      <app-channel-management></app-channel-management>
+    </h2>         
+    
     <ul class="channels-card-list">
       @for (channel of channels; track channel.id) {
       <li class="channels-card-item">

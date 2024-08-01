@@ -15,7 +15,7 @@ module.exports = class database {
 		this.db.run(
 			`CREATE TABLE IF NOT EXISTS user (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
-                name TEXT NOT NULL,
+                name TEXT NOT NULL UNIQUE,
                 password TEXT NOT NULL,
                 joined TEXT NOT NULL,
                 color TEXT NOT NULL
@@ -24,7 +24,7 @@ module.exports = class database {
 		this.db.run(
 			`CREATE TABLE IF NOT EXISTS channel (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
-                name TEXT NOT NULL,
+                name TEXT NOT NULL UNIQUE,
                 created TEXT NOT NULL,
                 color TEXT NOT NULL,
                 password TEXT
@@ -83,6 +83,49 @@ module.exports = class database {
 						reject(err);
 					}
 					resolve(rows);
+				}
+			);
+		});
+	}
+
+	async tryToCreateChannel(channel) {
+		return new Promise((resolve, reject) => {
+			this.db.get("SELECT id FROM channel WHERE name = ?", [channel.name], (err, row) => {
+				if (err) {
+					console.error(err.message);
+					reject(err);
+				}
+
+				if (row) {
+					resolve("Channel already exists");
+				} else {
+					this.createChannel(channel).then((row) => {
+						resolve(row);
+					});
+				}
+			});
+		});
+	}
+
+	async createChannel(channel) {
+		return new Promise((resolve, reject) => {
+			this.db.run(
+				`INSERT INTO channel (name, created, color, password) VALUES (?, ?, ?, ?)`,
+				[channel.name, channel.created, channel.color, channel.password],
+				(res, err) => {
+					if (err) {
+						console.error(err.message);
+						reject(err);
+					}
+
+					this.db.get("SELECT id, name, created, color FROM channel WHERE name = ?", [channel.name], (err, row) => {
+						if (err) {
+							console.error(err.message);
+							reject(err);
+						}
+
+						resolve(row);
+					});
 				}
 			);
 		});

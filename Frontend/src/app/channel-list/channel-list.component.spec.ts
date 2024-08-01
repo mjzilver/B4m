@@ -2,6 +2,7 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { By } from '@angular/platform-browser';
 import { ChannelListComponent } from './channel-list.component';
 import { Channel } from '../../types/channel';
+import { ChannelManagementComponent } from '../channel-management/channel-management.component';
 
 describe('ChannelListComponent', () => {
 	let component: ChannelListComponent;
@@ -9,9 +10,8 @@ describe('ChannelListComponent', () => {
 
 	beforeEach(async () => {
 		await TestBed.configureTestingModule({
-			declarations: [ ChannelListComponent ]
-		})
-			.compileComponents();
+			declarations: [ ChannelListComponent, ChannelManagementComponent]
+		}).compileComponents();
 	});
 
 	beforeEach(() => {

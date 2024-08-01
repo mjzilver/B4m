@@ -49,6 +49,9 @@ class WebSocketServer {
 			case "leaveChannel":
 				this.leaveChannel(parsedMessage.channel, parsedMessage.user);
 				break;
+			case "createChannel":
+				this.createChannel(parsedMessage.channel, socket);
+				break;
 			case "getUsers":
 				this.getUsers(socket);
 				break;
@@ -65,7 +68,7 @@ class WebSocketServer {
 				this.updateUser(parsedMessage.user, socket);
 				break
 			default:
-				console.log(`Unknown command: ${parsedMessage.command}`);
+				console.warn(`Unknown command: ${parsedMessage.command}`);
 			}
 		} catch (error) {
 			console.error("Failed to parse message:", error);
@@ -148,6 +151,30 @@ class WebSocketServer {
 				command: "channels",
 				channels: channels
 			}));
+		});
+	}
+
+	createChannel(channel, socket) {
+		const [valid, error] = this.validator.validateChannel(channel);
+
+		if (!valid) {
+			this.sendError(socket, error);
+			return;
+		}
+
+		channel.created = Date.now();
+
+		this.database.tryToCreateChannel(channel).then((row) => {
+			if (row) {
+				// broadcast new channel to all clients
+				this.server.clients.forEach((client) => {
+					if (client.readyState === WebSocket.OPEN) {
+						client.send(JSON.stringify({ command: "channelCreated", channel: row }));
+					}
+				});
+			} else {
+				this.sendError(socket, "Failed to create channel");
+			}
 		});
 	}
 

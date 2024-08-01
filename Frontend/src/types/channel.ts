@@ -25,3 +25,9 @@ export class Channel {
 		this.password = password;
 	}
 }
+
+export class NewChannel {
+	name: string = 'untitled';
+	color: string = 'grey';
+	password?: string;
+}

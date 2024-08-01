@@ -20,6 +20,19 @@ export class ChannelService {
 		return this.channels;
 	}
 
+	// update or add a channel
+	updateChannel(data: SocketChannel): void {
+		const channel = this.channels.find(c => c.id === data.id);
+		if (channel) {
+			channel.name = data.name;
+			channel.color = data.color;
+			channel.created = data.created;
+			channel.password = data.password;
+		} else {
+			this.channels.push(new Channel(data.id, data.name, data.color, data.created, data.password));
+		}
+	}
+
 	// Update the users in 1 channel
 	updateChannelUsers(data: SocketResponse): void {
 		const channel = this.channels.find(c => c.id === data.channel?.id);

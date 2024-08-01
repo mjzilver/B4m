@@ -6,7 +6,7 @@ import { UserService } from './user.service';
 import { ErrorService } from './error.service';
 import { SocketResponse } from '../../types/socketMessage'
 import { Message } from '../../types/message';
-import { Channel } from '../../types/channel';
+import { Channel, NewChannel } from '../../types/channel';
 import { User, UserLogin } from '../../types/user';
 
 @Injectable({
@@ -47,6 +47,11 @@ export class WebsocketService {
 		case 'channels':
 			this.channelService.parseChannels(parsed.channels!);
 			break;
+		case 'channelCreated':
+		case 'channelUpdated':
+		case 'channelDeleted':
+			this.channelService.updateChannel(parsed.channel!);
+			break;
 		case 'userJoinedChannel':
 		case 'userLeftChannel':
 			this.channelService.updateChannelUsers(parsed);
@@ -71,20 +76,19 @@ export class WebsocketService {
 		}
 	}
 
+	// MESSAGE COMMANDS //
 	sendMessage(message: Message): void {
 		this.wsConnectionService.sendMessage({ command: 'broadcast', message });
 	}
 
+	getMessages(channel: Channel): void {
+		this.wsConnectionService.sendMessage({ command: 'getMessages', channel });
+	}
+
+	// CHANNEL COMMANDS //
+
 	getChannels(): void {
 		this.wsConnectionService.sendMessage({ command: 'getChannels' });
-	}
-
-	getUsers(): void {
-		this.wsConnectionService.sendMessage({ command: 'getUsers' });
-	}
-
-	updateUser(user: User): void {
-		this.wsConnectionService.sendMessage({ command: 'updateUser', user });
 	}
 
 	joinChannel(channel: Channel, user: User): void {
@@ -95,8 +99,25 @@ export class WebsocketService {
 		this.wsConnectionService.sendMessage({ command: 'leaveChannel', channel, user });
 	}
 
-	getMessages(channel: Channel): void {
-		this.wsConnectionService.sendMessage({ command: 'getMessages', channel });
+	createChannel(channel: Channel | NewChannel): void {
+		this.wsConnectionService.sendMessage({ command: 'createChannel', channel });
+	}
+
+	updateChannel(channel: Channel): void {
+		this.wsConnectionService.sendMessage({ command: 'updateChannel', channel });
+	}
+
+	deleteChannel(channel: Channel): void {
+		this.wsConnectionService.sendMessage({ command: 'deleteChannel', channel });
+	}
+
+	// USER COMMANDS //
+	getUsers(): void {
+		this.wsConnectionService.sendMessage({ command: 'getUsers' });
+	}
+
+	updateUser(user: User): void {
+		this.wsConnectionService.sendMessage({ command: 'updateUser', user });
 	}
 
 	attemptLogin(user: UserLogin): void {

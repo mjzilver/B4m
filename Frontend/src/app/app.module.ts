@@ -18,6 +18,7 @@ import { UserService } from './websocket-service/user.service';
 import { ChannelService } from './websocket-service/channel.service';
 import { MessageService } from './websocket-service/message.service';
 import { AuthService } from './services/auth.service';
+import { ChannelManagementComponent } from "./channel-management/channel-management.component";
 
 const routes: Routes = [
 	{ path: '', component: AppComponent },
@@ -32,13 +33,14 @@ const routes: Routes = [
 		UserLoginComponent,
 		UserLogoutComponent,
 		ChannelListComponent,
+		ChannelManagementComponent,
 		ErrorDisplayComponent
 	],
 	imports: [
 		BrowserModule,
 		FormsModule,
 		ReactiveFormsModule,
-		RouterModule.forRoot(routes) 
+		RouterModule.forRoot(routes)
 	],
 	providers: [
 		WebsocketService,

@@ -50,7 +50,7 @@ module.exports = class Validator {
 			return [false, "Invalid channel object"];
     
 		// Check if the channel name is empty or too long
-		if (channel.name.length < 1 || channel.name.length > 200)
+		if (channel.name.length < 1 || channel.name.length > 50)
 			return [false, "Invalid channel name"];
 
 		// if channel has password, check if it is too long
