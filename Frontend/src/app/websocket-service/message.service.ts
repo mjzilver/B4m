@@ -27,13 +27,17 @@ export class MessageService {
 	}
 
 	parseMessage(data: SocketMessage, channels: Channel[]): Message {
-		const channel = channels.find(c => c.id === data.channel!.id);
+		if (!data || data.channel === undefined || data.user === undefined) {
+			console.warn('User or Channel is missing in parseMessage', data);
+		}
+
+		const channel = channels.find(c => c.id === data.channel?.id);
 		const user = new MessageUser(data.user!.id, data.user!.name, data.user!.color);
 
 		if (!user || !channel) {
-			throw new Error('User or Channel not found for message');
+			console.warn('User or Channel not found for message', data);
 		}
-		const newMessage = new Message(user, data.text, data.time, channel);
+		const newMessage = new Message(user, data.text, data.time, channel!);
 
 		this.messageSubject.next(newMessage);
 		return newMessage;
