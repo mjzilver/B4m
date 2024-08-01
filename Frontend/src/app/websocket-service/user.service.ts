@@ -25,4 +25,8 @@ export class UserService {
 		const currentUser = new User(user.id, user.name, user.joined, user.color);
 		this.currentUserSubject.next(currentUser);
 	}
+
+	handleLogout(): void {
+		this.currentUserSubject.next(null);
+	}
 }

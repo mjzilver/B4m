@@ -2,6 +2,9 @@
     font-size: 24px;
     margin-bottom: 20px;
 }
+.channels-card-name {
+    text-shadow: 1px 1px 1px black;
+}
 
 .channels-card-list {
     list-style-type: none;

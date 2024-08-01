@@ -8,4 +8,8 @@ export class MockUserService {
 	emitCurrentUser(user: User | null): void {
 		this.currentUserSubject.next(user);
 	}
+
+	handleLogout(): void {
+		this.currentUserSubject.next(null);
+	}
 }

@@ -72,7 +72,6 @@ class WebSocketServer {
 				break
 			default:
 				console.warn(`Unknown command: ${parsedMessage.command}`);
-				console.log(parsedMessage);
 			}
 		} catch (error) {
 			console.error("Failed to parse message:", error);

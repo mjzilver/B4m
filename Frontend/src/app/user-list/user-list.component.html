@@ -3,7 +3,7 @@
   <p class="user-list-message">Users connected to chosen channel:</p>
   <ul>
     @for (user of users; track user.id) {
-      <li class="user-list-item">{{ user.name }}</li>
+      <li class="user-list-item" [ngStyle]="{'color': user.color}">{{ user.name }}</li>
     } 
   </ul>
 }

@@ -30,7 +30,9 @@ export class AuthService {
 			return;
 		if (selectedChannel)
 		    this.websocketService.leaveChannel(selectedChannel, this.currentUser);
-        
+		
+		this.userService.handleLogout();
+
 		this.websocketService.logout(this.currentUser, selectedChannel);
 		this.currentUser = null;
 		selectedChannel = null;

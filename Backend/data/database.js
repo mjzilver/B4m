@@ -1,4 +1,5 @@
 const sqlite3 = require("sqlite3").verbose();
+const passwordHandler = require("./passwordHandler");
 
 module.exports = class database {
 	constructor() {
@@ -8,6 +9,7 @@ module.exports = class database {
 			}
 			console.log("Connected to the database.");
 			this.setupDatabase();
+			this.passwordHandler = new passwordHandler();
 		});
 	}
 
@@ -172,7 +174,7 @@ module.exports = class database {
 
 	async checkLogin(name, password) {
 		return new Promise((resolve, reject) => {
-			this.db.get("SELECT id, name, joined, color FROM user WHERE name = ? AND password = ?", [name, password], (err, row) => {
+			this.db.get("SELECT id, name, joined, color, password FROM user WHERE name = ?", [name], (err, row) => {
 
 				if (err) {
 					console.error(err.message);
@@ -180,7 +182,17 @@ module.exports = class database {
 				}
 
 				if (row) {
-					resolve(row);
+					// check hash
+					this.passwordHandler.checkPassword(password, row.password).then((result) => {
+						if (result) {
+							// remove password from user object
+							delete row.password;
+
+							resolve(row);
+						} else {
+							resolve(null);
+						}
+					});
 				} else {
 					resolve(null);
 				}
@@ -207,25 +219,30 @@ module.exports = class database {
 
 	async tryToCreateUser(user) {
 		return new Promise((resolve, reject) => {
-			this.db.run(
-				`INSERT INTO user (name, password, joined, color) VALUES (?, ?, ?, ?)`,
-				[user.name, user.password, user.joined, user.color],
-				(err) => {
-					if (err) {
-						console.error(err.message);
-						reject(err);
-					}
-
-					this.db.get("SELECT id, name, joined, color FROM user WHERE name = ?", [user.name], (err, row) => {
+			this.passwordHandler.hashPassword(user.password).then((hashedPassword) => {
+				this.db.run(
+					`INSERT INTO user (name, password, joined, color) VALUES (?, ?, ?, ?)`,
+					[user.name, hashedPassword, user.joined, user.color],
+					(err) => {
 						if (err) {
 							console.error(err.message);
 							reject(err);
 						}
 
-						resolve(row);
-					});
-				}
-			);
+						this.db.get("SELECT id, name, joined, color FROM user WHERE name = ?", [user.name], (err, row) => {
+							if (err) {
+								console.error(err.message);
+								reject(err);
+							}
+
+							resolve(row);
+						});
+					}
+				);
+			}, (err) => {
+				console.error(err);
+				reject(err);
+			});
 		});
 	}
 

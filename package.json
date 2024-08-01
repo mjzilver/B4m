@@ -1,12 +1,10 @@
 {
     "name": "b4m",
-    "description": "b4m = Botje Forum",
     "version": "1.0.0",
     "private": true,
     "scripts": {
         "install-all": "npm install --prefix frontend && npm install --prefix backend",
-        "start": "concurrently \"npm start --prefix frontend\" \"npm start --prefix backend\"",
-        "build": "concurrently \"npm run build --prefix frontend\" \"npm run build --prefix backend\""
+        "start": "concurrently \"npm start --prefix frontend\" \"npm start --prefix backend\""
     },
     "devDependencies": {
         "@types/socket.io-client": "^1.4.36",
