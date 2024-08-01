@@ -31,7 +31,7 @@ export class MessageService {
 			console.warn('User or Channel is missing in parseMessage', data);
 		}
 
-		const channel = channels.find(c => c.id === data.channel?.id);
+		const channel = channels.find(c => c.id === data.channel?.id || c.id === data.channel_id);
 		const user = new MessageUser(data.user!.id, data.user!.name, data.user!.color);
 
 		if (!user || !channel) {

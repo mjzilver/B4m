@@ -1,9 +1,9 @@
 <div class="user-list">
 @if(users.length !== 0) {
-  <p>Users connected to chosen channel:</p>
+  <p class="user-list-message">Users connected to chosen channel:</p>
   <ul>
     @for (user of users; track user.id) {
-      <li>{{ user.name }}</li>
+      <li class="user-list-item">{{ user.name }}</li>
     } 
   </ul>
 }
