@@ -1,34 +1,39 @@
 @if (isEditMode) {
-    <button class="button button-edit-channel" (click)="openModal()">+</button>
+    <button class="button button-edit-channel" (click)="openModal()">✎</button>
 } @else {
     <button class="button button-create-channel" (click)="openModal()">Create</button>
 }
 
 @if (showModal && channel) {
-<div class="modal-container">
-  <div class="modal-content">
-    <span class="close" (click)="closeModal()">&times;</span>
-    <h2>{{ isEditMode ? 'Edit' : 'Create' }} Channel</h2>
-    <form (ngSubmit)="onSubmit()">
-      <label id="channelName-label" for="channelName">Channel Name</label>
-      <input type="text" id="channelName" name="channelName" [(ngModel)]="channel.name" [readonly]="isEditMode" required>
+    <div class="modal-container">
+        <div class="modal-content">
+            <span class="close" (click)="closeModal()">&times;</span>
+            <h2>{{ isEditMode ? 'Edit' : 'Create' }} Channel</h2>
+            <form (ngSubmit)="onSubmit()">
+                <label id="channelName-label" for="channelName">Channel Name</label>
+                <input type="text" id="channelName" name="channelName" [(ngModel)]="channel.name" [readonly]="isEditMode" required>
 
-      <label for="color">Pick a color</label>
-      <select id="color" name="color" [(ngModel)]="channel.color" [selectedIndex]="allowedColors.indexOf(channel.color)">
-        @for (color of allowedColors; track color) {
-          @if(color === channel.color) {
-            <option [value]="color" selected>{{ color }}</option>
-          } @else {
-            <option [value]="color">{{ color }}</option>
-          }
-        }
-      </select>
+                <label for="color">Pick a color</label>
+                <select id="color" name="color" [(ngModel)]="channel.color"
+                    [selectedIndex]="allowedColors.indexOf(channel.color)">
+                    @for (color of allowedColors; track color) {
+                        @if(color === channel.color) {
+                            <option [value]="color" selected>{{ color }}</option>
+                        } @else {
+                            <option [value]="color">{{ color }}</option>
+                        }
+                    }
+                </select>
 
-      <label id="channel-password-label" for="password">Password (optional)</label>
-      <input type="password" id="channel-password" name="password" [(ngModel)]="channel.password">
+                <label id="channel-password-label" for="password">Password (optional)</label>
+                <input type="password" id="channel-password" name="password" [(ngModel)]="channel.password">
 
-      <button type="submit">{{ isEditMode ? 'Save Changes' : 'Create Channel' }}</button>
-    </form>
-  </div>
-</div>
+                <button type="submit">{{ isEditMode ? 'Save Changes' : 'Create Channel' }}</button>
+                @if(isEditMode) {
+                    <button type="button" class="button-delete-channel" (click)="onDeleteChannel()">Delete Channel</button>
+                }
+            </form>
+
+        </div>
+    </div>
 }

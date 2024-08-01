@@ -53,7 +53,13 @@ export class AppComponent implements OnInit, OnDestroy {
 		});
 
 		this.channelService.channels$.subscribe((channels: Channel[]) => {
-			this.channels = channels; ;
+			this.channels = channels;
+
+			
+			if(this.selectedChannel && !this.channels.includes(this.selectedChannel)) {
+				this.selectedChannel = null;
+				this.errorService.setError('Channel no longer exists, please select a new channel');
+			}
 		});
 
 		this.errorService.currentError$.subscribe((error: string | null) => {
@@ -75,9 +81,14 @@ export class AppComponent implements OnInit, OnDestroy {
 			return;
 		}
 
+		if(this.selectedChannel && this.selectedChannel === channel) {
+			return;
+		}
+
 		channel.messages = [];
 		if (this.selectedChannel) {
 			this.websocketService.leaveChannel(this.selectedChannel, this.currentUser!);
+			this.selectedChannel.messages = [];
 		}
 
 		this.selectedChannel = channel;

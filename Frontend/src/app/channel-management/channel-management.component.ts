@@ -55,6 +55,17 @@ export class ChannelManagementComponent implements OnInit {
 		this.closeModal();
 	}
 
+	onDeleteChannel() {
+		if (this.channel) {
+			if (this.isEditMode) {
+				// force type as its not a new channel if we are editing
+				const existingChannel = this.channel as Channel;
+				this.webSocketService.deleteChannel(existingChannel);
+			}
+		}
+		this.closeModal();
+	}
+
 	openModal() {
 		this.showModal = true;
 	}

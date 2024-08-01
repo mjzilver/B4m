@@ -22,7 +22,7 @@ describe('ChannelListComponent', () => {
 
 	it('should render all channels', () => {
 		const channels: Channel[] = [
-			new Channel(1, 'Channel 1', 'red', Date.now(), 'password'),
+			new Channel(1, 'Channel 1', 'red', Date.now()),
 			new Channel(2, 'Channel 2', 'blue', Date.now()),
 		];
 		component.channels = channels;
@@ -34,7 +34,7 @@ describe('ChannelListComponent', () => {
 
 	it('should highlight the selected channel', () => {
 		const channels: Channel[] = [
-			new Channel(1, 'Channel 1', 'red', Date.now(), 'password'),
+			new Channel(1, 'Channel 1', 'red', Date.now()),
 			new Channel(2, 'Channel 2', 'blue', Date.now()),
 		];
 		component.channels = channels;
@@ -48,7 +48,7 @@ describe('ChannelListComponent', () => {
 
 	it('should emit selectChannel event when a channel is clicked', () => {
 		const channels: Channel[] = [
-			new Channel(1, 'Channel 1', 'red', Date.now(), 'password'),
+			new Channel(1, 'Channel 1', 'red', Date.now()),
 			new Channel(2, 'Channel 2', 'blue', Date.now()),
 		];
 		component.channels = channels;

@@ -103,3 +103,18 @@ button[type="submit"]:hover {
 .button-edit-channel:hover {
     background-color: #0056b3;
 }
+
+.button-delete-channel {
+    background-color: #dc3545;
+    color: #fff;
+    border: none;
+    border-radius: 5px;
+    padding: 10px 20px;
+    cursor: pointer;
+    font-size: 16px;
+    margin: 10px;
+}
+
+.button-delete-channel:hover {
+    background-color: #c82333;
+}

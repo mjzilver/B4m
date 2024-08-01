@@ -49,8 +49,10 @@ export class WebsocketService {
 			break;
 		case 'channelCreated':
 		case 'channelUpdated':
-		case 'channelDeleted':
 			this.channelService.updateChannel(parsed.channel!);
+			break;
+		case 'channelDeleted':
+			this.channelService.deleteChannel(parsed.channel!);
 			break;
 		case 'userJoinedChannel':
 		case 'userLeftChannel':

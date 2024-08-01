@@ -1,5 +1,3 @@
-// class that handles encryption and checking of passwords
-
 const bcrypt = require('bcrypt');
 
 module.exports = class PasswordHandler {
@@ -7,7 +5,6 @@ module.exports = class PasswordHandler {
 
 	// hash a password
 	async hashPassword(password) {
-		await bcrypt.genSalt(10);
 		return bcrypt.hash(password, 10);
 	}
 

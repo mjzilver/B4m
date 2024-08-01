@@ -26,6 +26,7 @@ module.exports = class database {
 		this.db.run(
 			`CREATE TABLE IF NOT EXISTS channel (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
+				owner_id INTEGER,
                 name TEXT NOT NULL UNIQUE,
                 created TEXT NOT NULL,
                 color TEXT NOT NULL,
@@ -78,7 +79,7 @@ module.exports = class database {
 	async getAllChannels() {
 		return new Promise((resolve, reject) => {
 			this.db.all(
-				`SELECT id, name, created, color FROM channel`,
+				`SELECT id, name, created, color, owner_id FROM channel`,
 				(err, rows) => {
 					if (err) {
 						console.error(err.message);
@@ -112,15 +113,15 @@ module.exports = class database {
 	async createChannel(channel) {
 		return new Promise((resolve, reject) => {
 			this.db.run(
-				`INSERT INTO channel (name, created, color, password) VALUES (?, ?, ?, ?)`,
-				[channel.name, channel.created, channel.color, channel.password],
-				(res, err) => {
+				`INSERT INTO channel (name, created, color, password, owner_id) VALUES (?, ?, ?, ?, ?)`,
+				[channel.name, channel.created, channel.color, channel.password, channel.owner_id],
+				(err) => {
 					if (err) {
 						console.error(err.message);
 						reject(err);
 					}
 
-					this.db.get("SELECT id, name, created, color FROM channel WHERE name = ?", [channel.name], (err, row) => {
+					this.db.get("SELECT id, name, created, color, owner_id FROM channel WHERE name = ?", [channel.name], (err, row) => {
 						if (err) {
 							console.error(err.message);
 							reject(err);
@@ -128,6 +129,35 @@ module.exports = class database {
 
 						resolve(row);
 					});
+				}
+			);
+		});
+	}
+
+	async deleteChannel(channel, owner_id) {
+		return new Promise((resolve, reject) => {
+			this.db.run(
+				`DELETE FROM channel WHERE id = ? AND owner_id = ?`,
+				[channel.id, owner_id],
+				(err) => {
+					if (err) {
+						console.error(err.message);
+						reject(err);
+					}
+					// send the channel object back to the client to remove it from the list
+					resolve(channel); 
+
+					// delete all messages in the channel
+					this.db.run(
+						`DELETE FROM message WHERE channel_id = ?`,
+						[channel.id],
+						(err) => {
+							if (err) {
+								console.error(err.message);
+								reject(err);
+							}
+						}
+					);
 				}
 			);
 		});
@@ -144,7 +174,7 @@ module.exports = class database {
 						reject(err);
 					}
 
-					this.db.get("SELECT id, name, created, color FROM channel WHERE id = ?", [channel.id], (err, row) => {
+					this.db.get("SELECT id, name, created, color, owner_id FROM channel WHERE id = ?", [channel.id], (err, row) => {
 						if (err) {
 							console.error(err.message);
 							reject(err);

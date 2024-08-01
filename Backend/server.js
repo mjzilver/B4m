@@ -55,6 +55,9 @@ class WebSocketServer {
 			case "updateChannel":
 				this.updateChannel(parsedMessage.channel, socket);	
 				break
+			case "deleteChannel":
+				this.deleteChannel(parsedMessage.channel, socket);
+				break;
 			case "getUsers":
 				this.getUsers(socket);
 				break;
@@ -158,6 +161,13 @@ class WebSocketServer {
 	}
 
 	createChannel(channel, socket) {
+		const currentUser = this.memoryStore.getCurrentUser(socket).data;
+
+		if (!currentUser || !currentUser.id) {
+			this.sendError(socket, "User not found");
+			return;
+		}
+
 		const [valid, error] = this.validator.validateChannel(channel);
 
 		if (!valid) {
@@ -166,9 +176,10 @@ class WebSocketServer {
 		}
 
 		channel.created = Date.now();
+		channel.owner_id = currentUser.id;
 
 		this.database.tryToCreateChannel(channel).then((row) => {
-			if (row) {
+			if (row && row.id) {
 				// broadcast new channel to all clients
 				this.server.clients.forEach((client) => {
 					if (client.readyState === WebSocket.OPEN) {
@@ -176,7 +187,11 @@ class WebSocketServer {
 					}
 				});
 			} else {
-				this.sendError(socket, "Failed to create channel");
+				if(row) {
+					this.sendError(socket, row);
+				} else {
+					this.sendError(socket, "Failed to create channel");
+				}
 			}
 		});
 	}
@@ -199,6 +214,31 @@ class WebSocketServer {
 				});
 			} else {
 				this.sendError(socket, "Failed to update channel");
+			}
+		});
+	}
+
+	deleteChannel(channel, socket) {
+		const currentUser = this.memoryStore.getCurrentUser(socket).data;
+
+		if (!currentUser) {
+			this.sendError(socket, "User not found");
+			return;
+		}
+
+		this.database.deleteChannel(channel, currentUser.id).then((row) => {
+			if (row) {
+				// broadcast new channel to all clients
+				this.server.clients.forEach((client) => {
+					if (client.readyState === WebSocket.OPEN) {
+						client.send(JSON.stringify({ command: "channelDeleted", channel: row }));
+					}
+				});
+
+				// remove channel from memory
+				this.memoryStore.removeChannel(channel);
+			} else {
+				this.sendError(socket, "Failed to delete channel");
 			}
 		});
 	}

@@ -17,10 +17,6 @@
     align-items: center;
 }
 
-.channels-card-edit {
-    margin-left: 10px;
-}
-
 .channels-card-item .button-channel {
     width: 100%;
     display: flex;

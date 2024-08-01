@@ -1,4 +1,4 @@
-import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { ComponentFixture, fakeAsync, TestBed, tick } from '@angular/core/testing';
 import { FormsModule } from '@angular/forms';
 import { UserLoginComponent } from './user-login.component';
 import { AuthService } from '../services/auth.service';
@@ -14,24 +14,23 @@ describe('UserLoginComponent', () => {
 	let authService: AuthService;
 	let loginSpy: jasmine.Spy;
 
-	beforeEach(async () => {
-		await TestBed.configureTestingModule({
+	beforeEach(() => {
+		TestBed.configureTestingModule({
 			imports: [FormsModule],
 			declarations: [UserLoginComponent],
 			providers: [
 				{ provide: AuthService, useClass: MockAuthService }
 			]
-		})
-			.compileComponents();
+		}).compileComponents();
 	});
 
-	beforeEach(() => {
+	beforeEach(fakeAsync(() => {
 		fixture = TestBed.createComponent(UserLoginComponent);
 		component = fixture.componentInstance;
 		authService = TestBed.inject(AuthService);
 		loginSpy = spyOn(authService, 'login');
 		fixture.detectChanges();
-	});
+	}));
 
 	it('should create', () => {
 		expect(component).toBeTruthy();
@@ -57,18 +56,19 @@ describe('UserLoginComponent', () => {
 		expect(component.newUser.existingUser).toBeFalse();
 	});	
 
-	// this test is bugged and will fail
-	/*
-	it('should bind input values to newUser', async () => {
+	it('should bind input values to newUser', fakeAsync(() => {
 		fixture.autoDetectChanges();
+		tick();
+
 		const nameInput: HTMLInputElement = fixture.nativeElement.querySelector('input[name="name"]')!;
 
 		nameInput.value = 'testuser';
 		nameInput.dispatchEvent(new Event('input'));
+		nameInput.dispatchEvent(new Event('keyup'));
 
 		fixture.detectChanges();
+		tick();
 
 		expect(component.newUser.name).toBe('testuser');
-	}); 
-	*/
+	})); 
 });

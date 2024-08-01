@@ -9,12 +9,14 @@ export class Channel {
 	password?: string;
 	created: number;
 	color: string;
+	ownerId?: number;
 
 	constructor(
 		id: number,
 		name: string,
 		color: string,
 		created: number = Date.now(),
+		ownerId?: number,
 		password?: string
 	) {
 		this.id = id;
@@ -22,6 +24,7 @@ export class Channel {
 		this.created = created;
 		this.color = color;
 		this.id = id;
+		this.ownerId = ownerId;
 		this.password = password;
 	}
 }

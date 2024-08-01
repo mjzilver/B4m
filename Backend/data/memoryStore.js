@@ -25,6 +25,13 @@ module.exports = class MemoryStore {
 		return null;
 	}
 
+	removeChannel(channel) {
+		let foundChannel = this.getChannelById(channel.id);
+		if (foundChannel) {
+			this.channels.splice(this.channels.indexOf(foundChannel), 1);
+		}
+	}
+
 	addUserToChannel(user, channel) {
 		var foundChannel = this.getChannelById(channel.id)
 		
