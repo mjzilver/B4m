@@ -52,6 +52,9 @@ class WebSocketServer {
 			case "createChannel":
 				this.createChannel(parsedMessage.channel, socket);
 				break;
+			case "updateChannel":
+				this.updateChannel(parsedMessage.channel, socket);	
+				break
 			case "getUsers":
 				this.getUsers(socket);
 				break;
@@ -69,6 +72,7 @@ class WebSocketServer {
 				break
 			default:
 				console.warn(`Unknown command: ${parsedMessage.command}`);
+				console.log(parsedMessage);
 			}
 		} catch (error) {
 			console.error("Failed to parse message:", error);
@@ -174,6 +178,28 @@ class WebSocketServer {
 				});
 			} else {
 				this.sendError(socket, "Failed to create channel");
+			}
+		});
+	}
+
+	updateChannel(channel, socket) {
+		const [valid, error] = this.validator.validateChannel(channel);
+
+		if (!valid) {
+			this.sendError(socket, error);
+			return;
+		}
+
+		this.database.updateChannel(channel).then((row) => {
+			if (row) {
+				// broadcast new channel to all clients
+				this.server.clients.forEach((client) => {
+					if (client.readyState === WebSocket.OPEN) {
+						client.send(JSON.stringify({ command: "channelUpdated", channel: row }));
+					}
+				});
+			} else {
+				this.sendError(socket, "Failed to update channel");
 			}
 		});
 	}

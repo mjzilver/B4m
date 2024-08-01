@@ -1,4 +1,8 @@
-<button class="button button-create-channel" (click)="openModal()">Create/Edit Channel</button>
+@if (isEditMode) {
+    <button class="button button-edit-channel" (click)="openModal()">+</button>
+} @else {
+    <button class="button button-create-channel" (click)="openModal()">Create</button>
+}
 
 @if (showModal && channel) {
 <div class="modal-container">

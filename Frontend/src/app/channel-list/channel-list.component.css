@@ -10,10 +10,24 @@
 
 .channels-card-item {
     margin-bottom: 10px;
+    display: flex; 
+    align-items: center;
+}
+
+.channels-card-edit {
+    margin-left: 10px;
 }
 
 .channels-card-item .button-channel {
     width: 100%;
     display: flex;
     justify-content: space-between;
+    overflow: hidden;
+    flex-wrap: wrap;
+}
+
+/* Ensures wrapping */
+.channels-card-item .button-channel > * {
+    flex: 1 1 auto;
+    max-width: 100%;
 }

@@ -2,6 +2,7 @@ module.exports = class MemoryStore {
 	constructor() {
 		// user format: {data: user, socketId: socket.id, lastMessageTime: message.time}
 		this.users = [];
+		// channel format: {id: channel.id, users: [user]}
 		this.channels = [];
 	}
 

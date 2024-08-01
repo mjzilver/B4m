@@ -9,9 +9,14 @@
       <li class="channels-card-item">
         <button class="button button-channel" (click)="onSelectChannel(channel)"
           [ngClass]="{'selected-channel': channel.id === selectedChannel?.id}">
-          <span class="channels-card-name">{{ channel.name }}</span>
+          <span class="channels-card-name" [ngStyle]="{'color': channel.color}">{{ channel.name }}</span>
           <span class="channels-card-users">({{ channel.users.length }} users)</span>
+
         </button>
+        <span class="channels-card-edit">
+          <app-channel-management [channel]="channel" [isEditMode]="true">
+          </app-channel-management>
+        </span>
       </li>
       }
     </ul>

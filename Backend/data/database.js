@@ -131,6 +131,30 @@ module.exports = class database {
 		});
 	}
 
+	async updateChannel(channel) {
+		return new Promise((resolve, reject) => {
+			this.db.run(
+				`UPDATE channel SET color = ?, password = ? WHERE id = ?`,
+				[channel.color, channel.password, channel.id],
+				(err) => {
+					if (err) {
+						console.error(err.message);
+						reject(err);
+					}
+
+					this.db.get("SELECT id, name, created, color FROM channel WHERE id = ?", [channel.id], (err, row) => {
+						if (err) {
+							console.error(err.message);
+							reject(err);
+						}
+
+						resolve(row);
+					});
+				}
+			);
+		});
+	}
+
 	async getAllUsers() {
 		return new Promise((resolve, reject) => {
 			this.db.all(
