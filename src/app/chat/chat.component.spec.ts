@@ -5,12 +5,14 @@ import { ChangeDetectorRef, ElementRef } from '@angular/core';
 import { ChatComponent } from './chat.component';
 import { WebsocketService } from '../websocket-service/websocket.service';
 import { MessageService } from '../websocket-service/message.service';
+import { ChannelService } from '../websocket-service/channel.service';
 import { Message } from '../../types/message';
 import { Channel } from '../../types/channel';
 import { User } from '../../types/user';
 
 import { MockWebsocketService } from '../../mocks/MockWebSocketService';
 import { MockMessageService } from '../../mocks/MockMessageService';
+import { MockChannelService } from '../../mocks/MockChannelService';
 
 describe('ChatComponent', () => {
 	let component: ChatComponent;
@@ -27,6 +29,7 @@ describe('ChatComponent', () => {
 			providers: [
 				{ provide: WebsocketService, useClass: MockWebsocketService },
 				{ provide: MessageService, useClass: MockMessageService },
+				{ provide: ChannelService, useClass: MockChannelService },
 				ChangeDetectorRef
 			]
 		})

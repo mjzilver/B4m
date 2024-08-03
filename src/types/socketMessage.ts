@@ -25,6 +25,7 @@ export interface SocketChannel {
     password?: string;
     users?: Array<SocketUser>;
     ownerId?: number;
+    messages?: Array<SocketMessage>;
 }
 
 export interface SocketMessage {

@@ -12,7 +12,13 @@ export class MessageService {
 	private messageSubject = new Subject<Message>();
 	messages$ = this.messageSubject.asObservable();
 
+	private resetMessagesSubject = new Subject<void>();
+	resetMessages$ = this.resetMessagesSubject.asObservable();
+
 	parseMessages(data: SocketMessage[], channels: Channel[]): void {
+		// empty messages array
+		this.resetMessagesSubject.next();
+
 		data.forEach((item: SocketMessage) => {
 			const channel = channels.find(c => c.id === item.channelId);
 			const user = item.user ? new MessageUser(item.user.id, item.user.name, item.user.color) : undefined;

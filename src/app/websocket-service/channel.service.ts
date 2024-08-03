@@ -58,4 +58,10 @@ export class ChannelService {
 		this.currentChannel = channel;
 		this.currentChannel$.next(channel);
 	}
+
+	removeUserFromChannels(userId: number): void {
+		this.channels.forEach(channel => {
+			channel.users = channel.users.filter(user => user.id !== userId);
+		});
+	}
 }

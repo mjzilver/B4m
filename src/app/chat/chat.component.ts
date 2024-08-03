@@ -40,6 +40,11 @@ export class ChatComponent implements OnInit, OnDestroy {
 				this.scrollToBottom();
 			}
 		});
+
+		this.messageService.resetMessages$.subscribe(() => {
+			this.messages = [];
+			this.cd.detectChanges();
+		});
 		
 		this.channelService.currentChannel$.subscribe((channel: Channel | null) => {
 			if (channel) {

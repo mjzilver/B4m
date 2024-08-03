@@ -40,6 +40,10 @@ export class Channel {
 			ownerId: this.ownerId
 		};
 	}
+	
+	toDTO() {
+		return new Channel(this.id, this.name, this.color, this.created, this.ownerId, this.password);
+	}
 }
 
 export class MinChannel {

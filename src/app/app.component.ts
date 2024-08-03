@@ -85,15 +85,11 @@ export class AppComponent implements OnInit, OnDestroy {
 			return;
 		}
 
-		if(this.selectedChannel && this.selectedChannel === channel) {
-			return;
-		}
-
 		if (this.selectedChannel) {
 			this.websocketService.leaveChannel(this.selectedChannel, this.currentUser!);
-		}
+		} 
 
-		this.websocketService.getMessages(channel);
+		this.websocketService.getMessages(channel.toDTO());
 		this.websocketService.joinChannel(channel, this.currentUser!);
 		this.channelService.setCurrentChannel(channel);
 	}

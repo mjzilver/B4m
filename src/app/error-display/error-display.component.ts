@@ -17,4 +17,11 @@ export class ErrorDisplayComponent implements OnInit {
 	closeError() {
 		this.error = null;
 	}
+
+	// if error changes, close it after 5 seconds
+	ngOnChanges(): void {
+		if (this.error) {
+			setTimeout(() => this.closeError(), 5000);
+		}
+	}
 }

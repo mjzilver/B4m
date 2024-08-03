@@ -62,12 +62,12 @@ export class WebsocketService {
 			this.userService.parseUsers(parsed.users!);
 			break;
 		case 'userUpdated':
-		case 'login':
-		case 'register':
+		case 'loginUser':
+		case 'registerUser':
 			this.userService.handleLogin(parsed.user!);
 			break;
-		case 'logout':
-			// this is a confirmation that the user has been logged out
+		case 'logoutUser':
+			this.channelService.removeUserFromChannels(parsed.user!.id ?? -1);
 			break;
 		case 'error':
 			console.error(parsed.error);
@@ -80,7 +80,7 @@ export class WebsocketService {
 
 	// MESSAGE COMMANDS //
 	sendMessage(message: Message): void {
-		this.wsConnectionService.sendMessage({ command: 'broadcast', message });
+		this.wsConnectionService.sendMessage({ command: 'broadcastMessage', message });
 	}
 
 	getMessages(channel: Channel): void {
@@ -106,11 +106,11 @@ export class WebsocketService {
 	}
 
 	updateChannel(channel: Channel): void {
-		this.wsConnectionService.sendMessage({ command: 'updateChannel', channel });
+		this.wsConnectionService.sendMessage({ command: 'updateChannel', channel: channel.toDTO() });
 	}
 
 	deleteChannel(channel: Channel): void {
-		this.wsConnectionService.sendMessage({ command: 'deleteChannel', channel });
+		this.wsConnectionService.sendMessage({ command: 'deleteChannel', channel: channel.toDTO() });
 	}
 
 	// USER COMMANDS //
