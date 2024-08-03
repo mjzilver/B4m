@@ -56,17 +56,17 @@ const generateMockMessages = (mockUsers: User[], mockChannels: Channel[]) => [
 const generateMockSocketMessages = 
 	(mockSocketUsers: SocketUser[], mockSocketChannels: SocketChannel[]) => [
 		{
-			channel_id: mockSocketChannels[0].id,
+			channelId: mockSocketChannels[0].id,
 			text: 'Hello World!',
 			time: getUnixTimestamp(),
-			user_id: mockSocketUsers[0].id,
+			userId: mockSocketUsers[0].id,
 			user: mockSocketUsers[0]
 		},
 		{
-			channel_id: mockSocketChannels[1].id,
+			channelId: mockSocketChannels[1].id,
 			text: 'Goodbye!',
 			time: getUnixTimestamp(),
-			user_id: mockSocketUsers[1].id,
+			userId: mockSocketUsers[1].id,
 			user: mockSocketUsers[1]
 		}
 	];

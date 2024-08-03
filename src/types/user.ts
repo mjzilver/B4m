@@ -16,6 +16,15 @@ export class User {
 		this.joined = joined;
 		this.color = color;
 	}
+
+	getSerialized() {
+		return {
+			id: this.id,
+			name: this.name,
+			joined: this.joined,
+			color: this.color
+		};
+	}
 }
 
 export class UserLogin {
@@ -44,5 +53,13 @@ export class MessageUser {
 		this.id = id;
 		this.name = name;
 		this.color = color;
+	}
+
+	getSerialized() {	
+		return {
+			id: this.id,
+			name: this.name,
+			color: this.color
+		};
 	}
 }

@@ -20,14 +20,14 @@ export class WebsocketService {
         private userService: UserService,
         private errorService: ErrorService
 	) {
-		this.wsConnectionService.connect('ws://localhost:3000');
+		this.wsConnectionService.connect('ws://localhost:5000/ws');
 		this.wsConnectionService.onMessage((event: MessageEvent) => this.handleMessage(event));
 	}
 
 	private handleMessage(event: MessageEvent): void {
 		const parsed: SocketResponse = JSON.parse(event.data);
 
-		//console.log(`Received message: ${JSON.stringify(parsed)}`);
+		console.log(`Received message: ${JSON.stringify(parsed)}`);
 
 		if (parsed.error) {
 			console.error(parsed.error);
@@ -61,7 +61,7 @@ export class WebsocketService {
 		case 'users':
 			this.userService.parseUsers(parsed.users!);
 			break;
-		case 'userChanged':
+		case 'userUpdated':
 		case 'login':
 		case 'register':
 			this.userService.handleLogin(parsed.user!);
@@ -94,11 +94,11 @@ export class WebsocketService {
 	}
 
 	joinChannel(channel: Channel, user: User): void {
-		this.wsConnectionService.sendMessage({ command: 'joinChannel', channel, user });
+		this.wsConnectionService.sendMessage({ command: 'joinChannel', "channel": channel.getSerialized(), user });
 	}
 
 	leaveChannel(channel: Channel, user: User): void {
-		this.wsConnectionService.sendMessage({ command: 'leaveChannel', channel, user });
+		this.wsConnectionService.sendMessage({ command: 'leaveChannel', "channel": channel.getSerialized(), user });
 	}
 
 	createChannel(channel: Channel | NewChannel): void {

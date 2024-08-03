@@ -14,7 +14,7 @@ export class MessageService {
 
 	parseMessages(data: SocketMessage[], channels: Channel[]): void {
 		data.forEach((item: SocketMessage) => {
-			const channel = channels.find(c => c.id === item.channel_id);
+			const channel = channels.find(c => c.id === item.channelId);
 			const user = item.user ? new MessageUser(item.user.id, item.user.name, item.user.color) : undefined;
 
 			if (user && channel) {
@@ -31,12 +31,13 @@ export class MessageService {
 			console.warn('User or Channel is missing in parseMessage', data);
 		}
 
-		const channel = channels.find(c => c.id === data.channel?.id || c.id === data.channel_id);
+		const channel = channels.find(c => c.id === data.channel?.id || c.id === data.channelId);
 		const user = new MessageUser(data.user!.id, data.user!.name, data.user!.color);
 
 		if (!user || !channel) {
 			console.warn('User or Channel not found for message', data);
 		}
+
 		const newMessage = new Message(user, data.text, data.time, channel!);
 
 		this.messageSubject.next(newMessage);

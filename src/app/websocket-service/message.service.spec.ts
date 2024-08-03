@@ -27,17 +27,17 @@ describe('MessageService', () => {
 
 		const socketMessages: SocketMessage[] = [
 			{
-				channel_id: channels[0].id,
+				channelId: channels[0].id,
 				text: 'Hello World!',
 				time: Date.now(),
-				user_id: 33333, // invalid user
+				userId: 33333, // invalid user
 				user: mockUser1
 			},
 			{
-				channel_id: 99, // invalid channel
+				channelId: 99, // invalid channel
 				text: 'Goodbye!',
 				time: Date.now(),
-				user_id: mockUser2.id,
+				userId: mockUser2.id,
 				user: mockUser2
 			}
 		];
@@ -53,8 +53,8 @@ describe('MessageService', () => {
 		const socketMessage: SocketMessage = {
 			text: 'Hello World!',
 			time: Date.now(),
-			user_id: 0,
-			channel_id: 0, // invalid channel
+			userId: 0,
+			channelId: 0, // invalid channel
 			user: mockData.mockUsers[0]
 		};
 

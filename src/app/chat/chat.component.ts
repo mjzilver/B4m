@@ -5,6 +5,7 @@ import { Message } from '../../types/message';
 import { Channel } from '../../types/channel';
 import { User } from '../../types/user';
 import { Subscription } from 'rxjs';
+import { ChannelService } from '../websocket-service/channel.service';
 
 @Component({
 	selector: 'app-chat',
@@ -24,6 +25,7 @@ export class ChatComponent implements OnInit, OnDestroy {
 	constructor(
 		private websocketService: WebsocketService,
 		private messageService: MessageService,
+		private channelService: ChannelService,
 		private cd: ChangeDetectorRef
 	) { }
 
@@ -38,6 +40,14 @@ export class ChatComponent implements OnInit, OnDestroy {
 				this.scrollToBottom();
 			}
 		});
+		
+		this.channelService.currentChannel$.subscribe((channel: Channel | null) => {
+			if (channel) {
+				this.channel = channel;
+			}
+
+			this.messages = this.channel.messages;
+		});
 	}
 
 	ngOnDestroy(): void {
@@ -48,7 +58,6 @@ export class ChatComponent implements OnInit, OnDestroy {
 
 	ngOnChanges(): void {
 		if (this.channel) {
-			this.messages = [];
 			this.cd.detectChanges();
 		}
 	}

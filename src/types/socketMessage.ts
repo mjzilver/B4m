@@ -24,14 +24,14 @@ export interface SocketChannel {
     created: number;
     password?: string;
     users?: Array<SocketUser>;
-    owner_id?: number;
+    ownerId?: number;
 }
 
 export interface SocketMessage {
-    user_id: number;
+    userId: number;
     text: string;
     time: number;
-    channel_id: number;
+    channelId: number;
     user?: SocketUser;
     channel?: SocketChannel;
 }

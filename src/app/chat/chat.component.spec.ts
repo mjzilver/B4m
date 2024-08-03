@@ -1,10 +1,7 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
-
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { By } from '@angular/platform-browser';
 import { FormsModule } from '@angular/forms';
 import { ChangeDetectorRef, ElementRef } from '@angular/core';
-import { Subject } from 'rxjs';
 import { ChatComponent } from './chat.component';
 import { WebsocketService } from '../websocket-service/websocket.service';
 import { MessageService } from '../websocket-service/message.service';

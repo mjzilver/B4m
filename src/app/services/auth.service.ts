@@ -28,12 +28,14 @@ export class AuthService {
 	logout(selectedChannel: Channel | null): void {
 		if (!this.currentUser) 
 			return;
+
+		this.websocketService.logout(this.currentUser, selectedChannel);
+
 		if (selectedChannel)
 		    this.websocketService.leaveChannel(selectedChannel, this.currentUser);
 		
 		this.userService.handleLogout();
 
-		this.websocketService.logout(this.currentUser, selectedChannel);
 		this.currentUser = null;
 		selectedChannel = null;
 	}

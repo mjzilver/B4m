@@ -6,10 +6,15 @@ import { Component, Input, OnInit } from '@angular/core';
 	styleUrl: './error-display.component.css'
 })
 export class ErrorDisplayComponent implements OnInit {
+
 	@Input() error: string | null = '';
 
 	constructor() { }
 
 	ngOnInit(): void {
+	}
+
+	closeError() {
+		this.error = null;
 	}
 }

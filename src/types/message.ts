@@ -18,4 +18,12 @@ export class Message {
 		this.time = time;
 		this.channel = channel;
 	}
+
+	getSerialized() {
+		return {
+			user: this.user.getSerialized(),
+			text: this.text,
+			time: this.time
+		};
+	}
 }

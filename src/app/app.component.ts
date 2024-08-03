@@ -62,6 +62,10 @@ export class AppComponent implements OnInit, OnDestroy {
 			}
 		});
 
+		this.channelService.currentChannel$.subscribe((channel: Channel | null) => {
+			this.selectedChannel = channel;
+		});
+
 		this.errorService.currentError$.subscribe((error: string | null) => {
 			this.currentError = error;
 		});
@@ -85,14 +89,12 @@ export class AppComponent implements OnInit, OnDestroy {
 			return;
 		}
 
-		channel.messages = [];
 		if (this.selectedChannel) {
 			this.websocketService.leaveChannel(this.selectedChannel, this.currentUser!);
-			this.selectedChannel.messages = [];
 		}
 
-		this.selectedChannel = channel;
 		this.websocketService.getMessages(channel);
 		this.websocketService.joinChannel(channel, this.currentUser!);
+		this.channelService.setCurrentChannel(channel);
 	}
 }
