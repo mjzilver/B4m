@@ -8,6 +8,7 @@ import { SocketResponse } from '../../types/socketMessage'
 import { Message } from '../../types/message';
 import { Channel, NewChannel } from '../../types/channel';
 import { User, UserLogin } from '../../types/user';
+import { environment } from '../../environments/environment';
 
 @Injectable({
 	providedIn: 'root',
@@ -20,7 +21,7 @@ export class WebsocketService {
         private userService: UserService,
         private errorService: ErrorService
 	) {
-		this.wsConnectionService.connect('ws://localhost:5000/ws');
+		this.wsConnectionService.connect(environment.websocketUrl);
 		this.wsConnectionService.onMessage((event: MessageEvent) => this.handleMessage(event));
 	}
 
